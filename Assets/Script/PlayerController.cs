@@ -120,6 +120,7 @@ public class PlayerController : MonoBehaviour {
 	void Update () {
 		if (gameObject.tag == "enemyPlayer" && chara != -1 && !isEnemyReady) {
 			SetChara(chara, hairColor, eyeColor, costumeColor, "enemyPlayer");
+			PhotonManager.phase = PhotonManager.PHASE.isReady;
 			isEnemyReady = true;
 		}
 
@@ -127,7 +128,7 @@ public class PlayerController : MonoBehaviour {
 			GameObject.Find("PhotonManager").SendMessage("BattleEnd", gameObject.tag);
 		}
 
-		if (PhotonManager.isEnded) {
+		if (PhotonManager.phase == PhotonManager.PHASE.isEnded) {
 			GetComponent<NetworkCharacter>().enabled = false;
 			this.enabled = false;
 		}
@@ -143,7 +144,7 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 
-		if (gameObject.tag == "myPlayer" && PhotonManager.isPlaying) {
+		if (gameObject.tag == "myPlayer" && PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
 			/* ---------------------------------
 				左右の移動
 			---------------------------------- */

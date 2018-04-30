@@ -25,9 +25,11 @@ public class CameraScript : MonoBehaviour {
 				isReady = true;
 			}
 		}
-		if (PhotonManager.isPlaying) {
-			UpdateCameraPosition ();
-			UpdateOrthographicSize ();
+		if (PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
+			float x = (myPlayer.transform.position.x + enemyPlayer.transform.position.x) / 2;
+			transform.position = new Vector3(x, 1.6f, -10);
+			//UpdateCameraPosition ();
+			//UpdateOrthographicSize ();
 		}
 	}
 

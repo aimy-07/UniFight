@@ -31,7 +31,7 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			//HP
 			stream.SendNext(playerController.hp);
 			
-			if (PhotonManager.isPlaying) {
+			if (PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
 				//アニメーション
 				stream.SendNext(playerController.idleFlg);
 				stream.SendNext(playerController.walkFlg);
@@ -69,7 +69,7 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			//HP
 			playerController.hp = (float)stream.ReceiveNext();
 			
-			if (PhotonManager.isPlaying) {
+			if (PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
 				//アニメーション
 				Animator animator = transform.Find("UTC_Default").gameObject.GetComponent<Animator>();
 				bool idleFlg = (bool)stream.ReceiveNext();

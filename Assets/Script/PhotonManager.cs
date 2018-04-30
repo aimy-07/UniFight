@@ -6,14 +6,23 @@ using UnityEngine.SceneManagement;
 
 public class PhotonManager : Photon.MonoBehaviour {
 
-	public static bool isPlaying;
-	[SerializeField] Animator battleStartPanelAnim;
-
-	[SerializeField] GameObject statusText;
-	[SerializeField] GameObject connectPhotonButton;
-	[SerializeField] GameObject joinRoomButton;
+	public enum PHASE{
+		isConnecting, isReady, isStarting, isPlaying, isEnded, other
+	}
+	public static PHASE phase;
+	
+	[SerializeField] Text statusText;
+	[SerializeField] Button reconnectPhotonButton;
+	[SerializeField] Image networkImg;
+	public Sprite[] networkImgSprites;
+	[SerializeField] Button backButton;
+	[SerializeField] GameObject loadingImg;
 	[SerializeField] GameObject matchingCanvas;
+	[SerializeField] Text statusText1;
+	[SerializeField] Text statusText2;
+	[SerializeField] GameObject stopCanvas;
 	[SerializeField] GameObject mainCanvas;
+	[SerializeField] Animator battleStartPanelAnim;
 
 	public static float MAXHP = 20;
 	RectTransform myHpbarRect;
@@ -25,7 +34,6 @@ public class PhotonManager : Photon.MonoBehaviour {
 	public static float bigAttackDamage = 5;
 	public static float SkillDamage = 10;
 	
-	public static bool isEnded = false;
 	[SerializeField] GameObject resultCanvas;
 	[SerializeField] Text resultText;
 	GameObject winPlayer;
@@ -36,14 +44,27 @@ public class PhotonManager : Photon.MonoBehaviour {
 
 
 	void Start() {
+		phase = PHASE.isConnecting;
+
+		matchingCanvas.SetActive(true);
+		statusText.text = "";
+		backButton.interactable = true;
+		statusText1.text = "";
+		statusText2.text = "";
+		stopCanvas.SetActive(false);
 		mainCanvas.SetActive(false);
 		resultCanvas.SetActive(false);
-    	isPlaying = false;
 		OnlineResultScript.result = "";
+
+		ConnectPhoton();
     }
 	
 	void Update () {
-		if (isPlaying) {
+		if (phase == PHASE.isReady) {
+			BattleReady();
+			phase = PHASE.isStarting;
+		}
+		if (phase == PHASE.isPlaying) {
 			myHpbarRect.localScale = new Vector3(myPlayerPlayerController.hp / MAXHP, 1, 1);
 			enemyHpbarRect.localScale = new Vector3(enemyPlayerPlayerController.hp / MAXHP, 1, 1);
 		}
@@ -67,12 +88,11 @@ public class PhotonManager : Photon.MonoBehaviour {
 			myHpbarRect = GameObject.Find("2PHPbar").GetComponent<RectTransform>();
 			enemyHpbarRect = GameObject.Find("1PHPbar").GetComponent<RectTransform>();
 		}
-		isPlaying = true;
+		phase = PHASE.isPlaying;
 	}
 
 	void BattleEnd(string losePlayerTag) {
-		isPlaying = false;
-		isEnded = true;
+		phase = PHASE.isEnded;
 		if (losePlayerTag == "myPlayer") {
 			winPlayerTag = "enemyPlayer";
 		} else {
@@ -81,8 +101,13 @@ public class PhotonManager : Photon.MonoBehaviour {
 		GameObject cam = GameObject.Find("Main Camera");
 		GameObject winPlayer = GameObject.FindWithTag(winPlayerTag);
 		GameObject losePlayer = GameObject.FindWithTag(losePlayerTag);
-		float cam_x = (losePlayer.transform.position.x + winPlayer.transform.position.x) / 2;
-		cam.transform.position = new Vector3(cam_x, 1.6f, -10);
+		float cam_x;
+		if (winPlayerTag == "myPlayer") {
+			cam_x = winPlayer.transform.transform.position.x;
+		} else {
+			cam_x = losePlayer.transform.transform.position.x - 0.4f;
+		}
+		cam.transform.position = new Vector3(cam_x, 1.5f, -10);
 		cam.transform.eulerAngles = new Vector3(6, 0, 0);
 		cam.GetComponent<Camera>().orthographicSize = 0.6f;
 		Time.timeScale = 0.5f;
@@ -108,32 +133,52 @@ public class PhotonManager : Photon.MonoBehaviour {
 	//ボタンを押したらルームを出てリザルトシーンに遷移
 	public void GotoResult() {
 		PhotonNetwork.LeaveRoom();
-		PhotonNetwork.LeaveLobby();
+		PhotonNetwork.LeaveLobby(); 
 		PhotonNetwork.Disconnect();
 		SceneManager.LoadScene("OnlineResult");
 	}
 
-	// ボタンを押したらPhotonに接続する。
-	public void ConnectPhoton() {
+	public void GotoTitle() {
+		phase = PHASE.other;
+		PhotonNetwork.room.IsVisible = false;
+		PhotonNetwork.room.IsOpen = false;
+		PhotonNetwork.LeaveRoom();
+		PhotonNetwork.LeaveLobby();
+		PhotonNetwork.Disconnect();
+		SceneManager.LoadScene("Title");
+	}
+
+	// Photon関係 -----------------------------------------------------
+
+	// Photonに接続するメソッド
+	void ConnectPhoton() {
 		PhotonNetwork.ConnectUsingSettings("v1.0");
     	PhotonNetwork.logLevel = PhotonLogLevel.Full;
     	PhotonNetwork.sendRate = 60;
     	PhotonNetwork.sendRateOnSerialize = 60;
+		PhotonNetwork.BackgroundTimeout = 0;
+		reconnectPhotonButton.interactable = false;
+		networkImg.sprite = networkImgSprites[0];
+		statusText.text = "ネットワークに接続中...";
+		loadingImg.SetActive(true);
 	}
 
-	// ロビー入室時に呼ばれるコールバックメソッド
-	// OnJoinedLobby内でルーム一覧取ったりすると良い。
+	// Photonに接続した時に呼ばれるメソッド
+	void OnConnectedToPhoton() {
+		Debug.Log ("log : Photonに接続しました");
+		Debug.Log ("log : 自動的にロビーに入ります");
+	}
+
+	// ロビー入室時に呼ばれるメソッド
+	// Photonに接続すると自動的にロビーに入る
+	// 自動的にランダムにルームに入室する
 	void OnJoinedLobby () {
     	Debug.Log ("log : ロビーに入りました");
-		joinRoomButton.GetComponent<Button> ().interactable = true;
-	}
-
-	// ボタンを押したらランダムにルームに入室する。
-	public void JoinRoom(){
+		Debug.Log ("log : 自動的にルームに入ります");
 		PhotonNetwork.JoinRandomRoom();
 	}
 
-	// 入室可能なルームがなく、JoinRandomRoom()が失敗した(false)時に呼ばれる
+	// 入室可能なルームがなく、JoinRandomRoom()が失敗した(false)時に呼ばれるメソッド
 	// ルームに入れなかったので自分でルームを作る
     void OnPhotonRandomJoinFailed(){
 		// プレイヤーが退室した際に同期オブジェクトが消えないよう設定
@@ -149,69 +194,121 @@ public class PhotonManager : Photon.MonoBehaviour {
 		PhotonNetwork.JoinOrCreateRoom ("CustomPropertiesRoom", roomOptions, null);
     }
 
+	// なんらかの原因でルーム作成に失敗した時に呼ばれるメソッド
+	// 自動的にルーム再入室を試みる
+	void OnPhotonCreateRoomFailed(){
+		Debug.Log ("log : ルーム作成に失敗しました");
+		Debug.Log ("log : 再度ルーム入室を試みます");
+		PhotonNetwork.JoinRandomRoom();
+	}
+
 	// ルーム入室した時に呼ばれるコールバックメソッド
-	// ここでキャラクターなどのプレイヤー間で共有するGameObjectを作成すると良い。
+	// ここでキャラクターなどのプレイヤー間で共有するGameObjectを作成する
 	void OnJoinedRoom() {
     	Debug.Log ("log : ルームに入りました");
 		if (PhotonNetwork.room.PlayerCount == 1) {
 			PhotonNetwork.Instantiate("Player", new Vector3(-1, 0.01f, 0), Quaternion.identity, 0);
-			statusText.SetActive(true);
-			Destroy(connectPhotonButton);
-			Destroy(joinRoomButton);
+			statusText.text = "対戦相手を待っています...";
 		} else if (PhotonNetwork.room.PlayerCount == 2) {
 			PhotonNetwork.room.IsVisible = false;
 			PhotonNetwork.room.IsOpen = false;
+			statusText.text = "";
+			backButton.interactable = false;
 			PhotonNetwork.Instantiate("Player", new Vector3(1, 0.01f, 0), Quaternion.identity, 0);
-			Invoke("BattleReady", 0.5f);
 		}
 	}
 
 	// リモートプレイヤーがルームに入室した時によばれるメソッド
 	// 自分が先に入り、相手の入室を待機している時、相手が入室したらゲームが始まる
 	void OnPhotonPlayerConnected() {
+		Debug.Log ("log : リモートプレイヤーが入室しました");
 		if (PhotonNetwork.room.PlayerCount == 2) {
 			PhotonNetwork.room.IsVisible = false;
 			PhotonNetwork.room.IsOpen = false;
-			Invoke("BattleReady", 0.5f);
+			statusText.text = "";
+			backButton.interactable = false;
 		}
 	}
 
-	// ルーム作成
-	// public void CreateRoom(){
-    //     string userName = "ユーザ1";
-    //     string userId = "user1";
-    //     PhotonNetwork.autoCleanUpPlayerObjects = false;
-    //     //カスタムプロパティ
-    //     ExitGames.Client.Photon.Hashtable customProp = new ExitGames.Client.Photon.Hashtable();
-    //     customProp.Add ("userName", userName); //ユーザ名
-    //     customProp.Add ("userId", userId); //ユーザID
-    //     PhotonNetwork.SetPlayerCustomProperties(customProp);
-	// 	// ルームオプションの作成
-    //     RoomOptions roomOptions = new RoomOptions ();
-    //     roomOptions.customRoomProperties = customProp;
-    //     //ロビーで見えるルーム情報としてカスタムプロパティのuserName,userIdを使いますよという宣言
-    //     roomOptions.customRoomPropertiesForLobby = new string[]{ "userName","userId"};
-    //     roomOptions.maxPlayers = 2; //部屋の最大人数
-    //     roomOptions.isOpen = true; //入室許可する
-    //     roomOptions.isVisible = true; //ロビーから見えるようにする
-    //     //userIdが名前のルームがなければ作って入室、あれば普通に入室する。
-    //     PhotonNetwork.JoinOrCreateRoom (userId, roomOptions, null);
-    // }	
+	// Photonとの接続が切断された時に呼ばれるメソッド
+	void OnDisconnectedFromPhoton(){
+		Debug.Log ("log : 通信が切断されました");
+		switch(phase) {
+			case PHASE.isConnecting:
+				statusText.text = "通信エラーが発生しました\n通信が安定した場所で再度接続してください";
+				reconnectPhotonButton.interactable = true;
+				networkImg.sprite = networkImgSprites[1];
+				loadingImg.SetActive(false);
+				break;
+			case PHASE.isReady:
+			case PHASE.isStarting:
+			case PHASE.isPlaying:
+				stopCanvas.SetActive(true);
+				statusText1.text = "通信エラーが発生しました";
+				BackTitleCountdown3();
+				break;
+			case PHASE.isEnded:
+				Debug.Log ("log : すでに勝敗がついています");
+				break;
+			case PHASE.other:
+				Debug.Log ("log : タイトルに戻る時の接続遮断");
+				break;
+		}
+	}
 
-    // ルーム一覧が取れると呼ばれるメソッド
-    // void OnReceivedRoomListUpdate(){
-    //     //ルーム一覧を取る
-    //     RoomInfo[] rooms = PhotonNetwork.GetRoomList();
-    //     if (rooms.Length == 0) {
-    //         Debug.Log ("ルームが一つもありません");
-    //     } else {
-    //         //ルームが1件以上ある時ループでRoomInfo情報をログ出力
-    //         for (int i = 0; i < rooms.Length; i++) {
-    //             Debug.Log ("RoomName:"   + rooms [i].name);
-    //             Debug.Log ("userName:" + rooms[i].customProperties["userName"]);
-    //             Debug.Log ("userId:"   + rooms[i].customProperties["userId"]);
-    //             GameObject.Find("StatusText").GetComponent<Text>().text = rooms [i].name;
-    //         }
-    //     }
-    // }
+	// リモートプレイヤーが退室した時に呼ばれるメソッド
+	void OnPhotonPlayerDisconnected(PhotonPlayer otherPlayer){
+		Debug.Log ("log : リモートプレイヤーが退室しました");
+		switch(phase) {
+			case PHASE.isReady:
+			case PHASE.isStarting:
+			case PHASE.isPlaying:
+				stopCanvas.SetActive(true);
+				statusText1.text = "通信エラーが発生しました";
+				BackTitleCountdown3();
+			break;
+			case PHASE.isEnded:
+				Debug.Log ("log : すでに勝敗がついています");
+			break;
+		}	
+	}
+
+	// CCU上限を超えた時に呼ばれるメソッド
+	void OnPhotonMaxCccuReached(){
+		Debug.Log ("log : 同時接続人数が20人を超えました");
+		switch(phase) {
+			case PHASE.isConnecting:
+			case PHASE.isReady:
+			case PHASE.isStarting:
+			case PHASE.isPlaying:
+				stopCanvas.SetActive(true);
+				statusText1.text = "現在同時接続人数が上限を超えています\n時間を置いて再度プレイしてください";
+				BackTitleCountdown3();
+			break;
+			case PHASE.isEnded:
+				Debug.Log ("log : すでに勝敗がついています");
+			break;
+		}	
+		statusText.text = "同時接続人数が上限を超えました\n時間を置いて再度プレイしてください";
+		Debug.Log ("log : 同時接続人数が20人を超えました");
+	}
+
+	void BackTitleCountdown3() {
+		statusText2.text = "3秒後にタイトルにもどります";
+		Invoke("BackTitleCountdown2", 1);
+		Invoke("BackTitleCountdown1", 2);
+		Invoke("BackTitle", 3);
+	}
+
+	void BackTitleCountdown2() {
+		statusText2.text = "2秒後にタイトルにもどります";
+	}
+
+	void BackTitleCountdown1() {
+		statusText2.text = "1秒後にタイトルにもどります";
+	}
+
+	void BackTitle() {
+		SceneManager.LoadScene("Title");
+	}
 }
