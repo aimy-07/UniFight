@@ -154,7 +154,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0, g: 1, b: 0.13103461, a: 0}
+  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 1}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -352,6 +352,7 @@ GameObject:
   - component: {fileID: 275548424}
   - component: {fileID: 275548426}
   - component: {fileID: 275548425}
+  - component: {fileID: 275548427}
   m_Layer: 5
   m_Name: SelectCostumeButtonFrame
   m_TagString: Untagged
@@ -411,6 +412,21 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 275548423}
+--- !u!111 &275548427
+Animation:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 275548423}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: 901d2a7b00edd49afa24dd8241854b04, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 901d2a7b00edd49afa24dd8241854b04, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &284312190
 GameObject:
   m_ObjectHideFlags: 0
@@ -486,6 +502,7 @@ GameObject:
   - component: {fileID: 351930813}
   - component: {fileID: 351930815}
   - component: {fileID: 351930814}
+  - component: {fileID: 351930816}
   m_Layer: 5
   m_Name: RankingButtonFrame
   m_TagString: Untagged
@@ -545,48 +562,21 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 351930812}
---- !u!1001 &401184666
-Prefab:
+--- !u!111 &351930816
+Animation:
   m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4540221657859390, guid: 6077aaa6f178548f4b791f0122f393f5, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4540221657859390, guid: 6077aaa6f178548f4b791f0122f393f5, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4540221657859390, guid: 6077aaa6f178548f4b791f0122f393f5, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4540221657859390, guid: 6077aaa6f178548f4b791f0122f393f5, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4540221657859390, guid: 6077aaa6f178548f4b791f0122f393f5, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4540221657859390, guid: 6077aaa6f178548f4b791f0122f393f5, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4540221657859390, guid: 6077aaa6f178548f4b791f0122f393f5, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4540221657859390, guid: 6077aaa6f178548f4b791f0122f393f5, type: 2}
-      propertyPath: m_RootOrder
-      value: 3
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 6077aaa6f178548f4b791f0122f393f5, type: 2}
-  m_IsPrefabParent: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 351930812}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: 901d2a7b00edd49afa24dd8241854b04, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 901d2a7b00edd49afa24dd8241854b04, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &433601320
 GameObject:
   m_ObjectHideFlags: 0
@@ -742,7 +732,7 @@ Transform:
   m_LocalScale: {x: 0.3, y: 0.3, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &785785569
 GameObject:
@@ -835,7 +825,7 @@ RectTransform:
   - {fileID: 351930813}
   - {fileID: 1013053829}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1093,7 +1083,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1219055955
 GameObject:
@@ -1135,12 +1125,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1375654569 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114441410684506032, guid: 6077aaa6f178548f4b791f0122f393f5,
-    type: 2}
-  m_PrefabInternal: {fileID: 401184666}
-  m_Script: {fileID: 11500000, guid: 3ad58daa62ead43a78171f7feba36b34, type: 3}
 --- !u!1 &1566909610
 GameObject:
   m_ObjectHideFlags: 0
@@ -1217,8 +1201,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1375654569}
-        m_MethodName: toSelectCostume
+      - m_Target: {fileID: 1219055956}
+        m_MethodName: toSelectCostumeButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1300,7 +1284,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4623740812745284, guid: b0768a4ef7556e24697ad2db0cc36243, type: 2}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4623740812745284, guid: b0768a4ef7556e24697ad2db0cc36243, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -1554,8 +1538,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1375654569}
-        m_MethodName: toMatching
+      - m_Target: {fileID: 1219055956}
+        m_MethodName: toMatchingButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1676,8 +1660,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1375654569}
-        m_MethodName: toRecord
+      - m_Target: {fileID: 1219055956}
+        m_MethodName: toRecordButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1732,6 +1716,7 @@ GameObject:
   - component: {fileID: 2130231981}
   - component: {fileID: 2130231983}
   - component: {fileID: 2130231982}
+  - component: {fileID: 2130231984}
   m_Layer: 5
   m_Name: StartButtonFrame
   m_TagString: Untagged
@@ -1791,3 +1776,18 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2130231980}
+--- !u!111 &2130231984
+Animation:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2130231980}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: 901d2a7b00edd49afa24dd8241854b04, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 901d2a7b00edd49afa24dd8241854b04, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0

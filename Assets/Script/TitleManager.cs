@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TitleManager : MonoBehaviour {
 
@@ -45,5 +46,32 @@ public class TitleManager : MonoBehaviour {
 			charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + eyeColor) as Material;
 			break;
 		}
+	}
+
+	void toSelectCostume() {
+		SceneManager.LoadScene("SelectCostume");
+	}
+
+	void toMatching() {
+		SceneManager.LoadScene("Main");
+	}
+
+	void toRecord() {
+		SceneManager.LoadScene("Record");
+	}
+
+	public void toSelectCostumeButton() {
+		Invoke("toSelectCostume", 0.5f);
+		GameObject.Find("SelectCostumeButtonFrame").GetComponent<Animation>().Play();
+	}
+
+	public void toMatchingButton() {
+		Invoke("toMatching", 0.5f);
+		GameObject.Find("StartButtonFrame").GetComponent<Animation>().Play();
+	}
+
+	public void toRecordButton() {
+		Invoke("toRecord", 0.5f);
+		GameObject.Find("RankingButtonFrame").GetComponent<Animation>().Play();
 	}
 }
