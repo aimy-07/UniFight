@@ -198,9 +198,9 @@ public class PlayerController : MonoBehaviour {
 				isGround = false;
 			}
 			ButtonScript.isGround = isGround;
-			if (ButtonScript.upButtonPressed && isGround) {
+			if (ButtonScript.upButtonPressing && isGround) {
         	    rigid.AddForce(Vector3.up * flap);
-				ButtonScript.upButtonPressed = false;
+				ButtonScript.upButtonPressing = false;
         	}
 
 			/* ---------------------------------

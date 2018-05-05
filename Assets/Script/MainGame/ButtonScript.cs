@@ -12,7 +12,7 @@ public class ButtonScript : MonoBehaviour {
 	public static bool rightButtonPressing;
 	public static bool rightButtonUpped;
 
-	public static bool upButtonPressed;
+	public static bool upButtonPressing;
 	public static bool downButtonPressed;
 	public static bool isGround;
 	public static bool smallAttackButtonPressed;
@@ -45,7 +45,7 @@ public class ButtonScript : MonoBehaviour {
 		rightButtonPressed = false;
 		rightButtonPressing = false;
 		rightButtonUpped = false;
-		upButtonPressed = false;
+		upButtonPressing = false;
 		downButtonPressed = false;
 		smallAttackButtonPressed = false;
 		bigAttackButtonPressed = false;
@@ -136,7 +136,11 @@ public class ButtonScript : MonoBehaviour {
 	}
 
 	public void UpButtonDown() {
-		upButtonPressed = true;
+		upButtonPressing = true;
+	}
+
+	public void UpButtonUp() {
+		upButtonPressing = false;
 	}
 
 	public void DownButtonDown() {
