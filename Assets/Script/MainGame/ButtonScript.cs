@@ -54,6 +54,26 @@ public class ButtonScript : MonoBehaviour {
 	}
 	
 	void Update () {
+		if (PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
+			if (30 < Input.mousePosition.x && Input.mousePosition.x < 290) {
+				if (220 < Input.mousePosition.y && Input.mousePosition.y < 280) {
+					UpButtonDown();
+				} else {
+					UpButtonUp();
+				}
+				if (30 < Input.mousePosition.x && Input.mousePosition.x < 160) {
+					LeftButtonDown();
+				} else {
+					RightButtonDown();
+				}
+			} else {
+				UpButtonUp();
+				RightButtonUp();
+				LeftButtoUp();
+			}
+		}
+
+
 		if (leftButtonPressing) {
 			rightButton.interactable = false;
 		} else {
@@ -118,6 +138,7 @@ public class ButtonScript : MonoBehaviour {
 	public void LeftButtonDown() {
 		leftButtonPressed = true;
 		leftButtonPressing = true;
+		rightButtonPressing = false;
 	}
 
 	public void LeftButtoUp() {
@@ -128,6 +149,7 @@ public class ButtonScript : MonoBehaviour {
 	public void RightButtonDown() {
 		rightButtonPressed = true;
 		rightButtonPressing = true;
+		leftButtonPressing = false;
 	}
 
 	public void RightButtonUp() {

@@ -105,8 +105,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1978521563292782}
   m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0.4}
-  m_LocalScale: {x: 0.4, y: 0.5, z: 0.5}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0.45}
+  m_LocalScale: {x: 0.3, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 4619058726631896}
   m_RootOrder: 1
@@ -255,11 +255,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14650efaa3e3e4239ab2ede3b3d94f22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hokan: 0.85
-  avoidEffect_L: {fileID: 1358069940114394, guid: 361350b7a47304db480b35de19cd1130,
-    type: 2}
-  avoidEffect_R: {fileID: 1526668941855556, guid: a08e616c2ab354a6fa4770b0f5af5093,
-    type: 2}
 --- !u!114 &114438195316527028
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -296,10 +291,6 @@ MonoBehaviour:
   flap: 550
   scroll: 3
   isGround: 1
-  avoidEffect_L: {fileID: 1358069940114394, guid: 361350b7a47304db480b35de19cd1130,
-    type: 2}
-  avoidEffect_R: {fileID: 1526668941855556, guid: a08e616c2ab354a6fa4770b0f5af5093,
-    type: 2}
   idleFlg: 0
   walkFlg: 0
   jumpDownFlg: 0
@@ -308,11 +299,8 @@ MonoBehaviour:
   skillFlg: 0
   avoidFlg: 0
   damageFlg: 0
-  chara: -1
-  hairColor: -1
-  eyeColor: -1
-  costumeColor: -1
-  isEnemyReady: 0
+  deathFlg: 0
+  hp: 0
 --- !u!114 &114767494052766022
 MonoBehaviour:
   m_ObjectHideFlags: 1

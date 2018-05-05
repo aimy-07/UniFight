@@ -192,15 +192,9 @@ public class PlayerController : MonoBehaviour {
 			/* ---------------------------------
 				ジャンプ
 			---------------------------------- */
-			if (transform.position.y < 0.02f) {
-				isGround = true;
-			} else {
-				isGround = false;
-			}
 			ButtonScript.isGround = isGround;
 			if (ButtonScript.upButtonPressing && isGround) {
         	    rigid.AddForce(Vector3.up * flap);
-				ButtonScript.upButtonPressing = false;
         	}
 
 			/* ---------------------------------
@@ -266,6 +260,18 @@ public class PlayerController : MonoBehaviour {
 				}
 				ButtonScript.avoidButtonPressed = false;
         	}
+		}
+	}
+
+	void OnCollisionEnter(Collision c) {
+		if (c.gameObject.tag == "floor") {
+			isGround = true;
+		}
+	}
+
+	void OnCollisionExit(Collision c) {
+		if (c.gameObject.tag == "floor") {
+			isGround = false;
 		}
 	}
 

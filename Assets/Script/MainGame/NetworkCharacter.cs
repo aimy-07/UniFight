@@ -35,27 +35,25 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			//HP
 			stream.SendNext(playerController.hp);
 			
-			if (PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
-				//アニメーション
-				stream.SendNext(playerController.idleFlg);
-				stream.SendNext(playerController.walkFlg);
-				stream.SendNext(playerController.jumpDownFlg);
-				stream.SendNext(playerController.smallAttackFlg);
-				stream.SendNext(playerController.bigAttackFlg);
-				stream.SendNext(playerController.skillFlg);
-				stream.SendNext(playerController.avoidFlg);
-				stream.SendNext(playerController.damageFlg);
-				stream.SendNext(playerController.deathFlg);
-				playerController.idleFlg = false;
-				playerController.walkFlg = false;
-				playerController.jumpDownFlg = false;
-				playerController.smallAttackFlg = false;
-				playerController.bigAttackFlg = false;
-				playerController.skillFlg = false;
-				playerController.avoidFlg = false;
-				playerController.damageFlg = false;
-				playerController.deathFlg = false;
-			}
+			//アニメーション
+			stream.SendNext(playerController.idleFlg);
+			stream.SendNext(playerController.walkFlg);
+			stream.SendNext(playerController.jumpDownFlg);
+			stream.SendNext(playerController.smallAttackFlg);
+			stream.SendNext(playerController.bigAttackFlg);
+			stream.SendNext(playerController.skillFlg);
+			stream.SendNext(playerController.avoidFlg);
+			stream.SendNext(playerController.damageFlg);
+			stream.SendNext(playerController.deathFlg);
+			playerController.idleFlg = false;
+			playerController.walkFlg = false;
+			playerController.jumpDownFlg = false;
+			playerController.smallAttackFlg = false;
+			playerController.bigAttackFlg = false;
+			playerController.skillFlg = false;
+			playerController.avoidFlg = false;
+			playerController.damageFlg = false;
+			playerController.deathFlg = false;
 
 		} else {
 			Debug.Log("Receivred : " + gameObject.tag);
@@ -75,60 +73,58 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			//HP
 			playerController.hp = (float)stream.ReceiveNext();
 			
-			if (PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
-				//アニメーション
-				Animator animator = transform.Find("UTC_Default").gameObject.GetComponent<Animator>();
-				bool idleFlg = (bool)stream.ReceiveNext();
-				bool walkFlg = (bool)stream.ReceiveNext();
-				bool jumpDownFlg = (bool)stream.ReceiveNext();
-				bool smallAttackFlg = (bool)stream.ReceiveNext();
-				bool bigAttackFlg = (bool)stream.ReceiveNext();
-				bool skillFlg = (bool)stream.ReceiveNext();
-				bool avoidFlg = (bool)stream.ReceiveNext();
-				bool damageFlg = (bool)stream.ReceiveNext();
-				bool deathFlg = (bool)stream.ReceiveNext();
-				if (idleFlg) {
-        			animator.SetTrigger("Idle");
-      			}
-				if (walkFlg) {
-        			animator.SetTrigger("Walk");
-      			}
-				if (jumpDownFlg) {
-        			animator.SetTrigger("JumpDown");
-      			}
-      			if (smallAttackFlg) {
-        			animator.SetTrigger("SmallAttack");
-      			}
-				if (bigAttackFlg) {
-        			animator.SetTrigger("BigAttack");
-      			}
-				if (skillFlg) {
-        			animator.SetTrigger("Skill");
-      			}
-				if (avoidFlg) {
-        			if (transform.position.x > myPos) {
-						Instantiate(Resources.Load("AvoidEffect/AvoidEffectRight" + playerController.chara) as GameObject, new Vector3(transform.position.x, transform.position.y, -1), Quaternion.identity);
-						if (transform.position.x > 3 - 1) {
-							transform.position = new Vector3(3, transform.position.y, 0);
-						} else {
-							transform.position = new Vector3(transform.position.x + 1, transform.position.y, 0);
-						}
+			//アニメーション
+			Animator animator = transform.Find("UTC_Default").gameObject.GetComponent<Animator>();
+			bool idleFlg = (bool)stream.ReceiveNext();
+			bool walkFlg = (bool)stream.ReceiveNext();
+			bool jumpDownFlg = (bool)stream.ReceiveNext();
+			bool smallAttackFlg = (bool)stream.ReceiveNext();
+			bool bigAttackFlg = (bool)stream.ReceiveNext();
+			bool skillFlg = (bool)stream.ReceiveNext();
+			bool avoidFlg = (bool)stream.ReceiveNext();
+			bool damageFlg = (bool)stream.ReceiveNext();
+			bool deathFlg = (bool)stream.ReceiveNext();
+			if (idleFlg) {
+        		animator.SetTrigger("Idle");
+      		}
+			if (walkFlg) {
+        		animator.SetTrigger("Walk");
+      		}
+			if (jumpDownFlg) {
+        		animator.SetTrigger("JumpDown");
+      		}
+      		if (smallAttackFlg) {
+        		animator.SetTrigger("SmallAttack");
+      		}
+			if (bigAttackFlg) {
+        		animator.SetTrigger("BigAttack");
+      		}
+			if (skillFlg) {
+        		animator.SetTrigger("Skill");
+      		}
+			if (avoidFlg) {
+        		if (transform.position.x > myPos) {
+					Instantiate(Resources.Load("AvoidEffect/AvoidEffectRight" + playerController.chara) as GameObject, new Vector3(transform.position.x, transform.position.y, -1), Quaternion.identity);
+					if (transform.position.x > 3 - 1) {
+						transform.position = new Vector3(3, transform.position.y, 0);
 					} else {
-						Instantiate(Resources.Load("AvoidEffect/AvoidEffectLeft" + playerController.chara) as GameObject, new Vector3(transform.position.x, transform.position.y, -1), Quaternion.identity);
-						if (transform.position.x < -3 + 1) {
-							transform.position = new Vector3(-3, transform.position.y, 0);
-						} else {
-							transform.position = new Vector3(transform.position.x - 1, transform.position.y, 0);
-						}
+						transform.position = new Vector3(transform.position.x + 1, transform.position.y, 0);
 					}
-      			}
-				if (damageFlg) {
-        			animator.SetTrigger("Damage");
-      			}
-				if (deathFlg) {
-        			animator.SetTrigger("Death");
-      			}
-			}
+				} else {
+					Instantiate(Resources.Load("AvoidEffect/AvoidEffectLeft" + playerController.chara) as GameObject, new Vector3(transform.position.x, transform.position.y, -1), Quaternion.identity);
+					if (transform.position.x < -3 + 1) {
+						transform.position = new Vector3(-3, transform.position.y, 0);
+					} else {
+						transform.position = new Vector3(transform.position.x - 1, transform.position.y, 0);
+					}
+				}
+      		}
+			if (damageFlg) {
+        		animator.SetTrigger("Damage");
+      		}
+			if (deathFlg) {
+        		animator.SetTrigger("Death");
+      		}
 		}
 	}
 }

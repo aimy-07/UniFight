@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
 
 public class PhotonManager : Photon.MonoBehaviour {
 
@@ -193,6 +194,8 @@ public class PhotonManager : Photon.MonoBehaviour {
 	// 入室可能なルームがなく、JoinRandomRoom()が失敗した(false)時に呼ばれるメソッド
 	// ルームに入れなかったので自分でルームを作る
     void OnPhotonRandomJoinFailed(){
+		Debug.Log("log : 入室可能なルームがありませんでした");
+		Debug.Log("log : 自動的にルームを作成します");
 		// プレイヤーが退室した際に同期オブジェクトが消えないよう設定
 		PhotonNetwork.autoCleanUpPlayerObjects = false;
 		// ルームオプションの作成
@@ -203,7 +206,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 		roomOptions.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable(){{"CustomProperties", "カスタムプロパティ"} };
 		roomOptions.CustomRoomPropertiesForLobby = new string[] {"CustomProperties"};
 		// ルームの作成
-		PhotonNetwork.JoinOrCreateRoom ("CustomPropertiesRoom", roomOptions, null);
+		PhotonNetwork.JoinOrCreateRoom (Guid.NewGuid().ToString(), roomOptions, null);
     }
 
 	// なんらかの原因でルーム作成に失敗した時に呼ばれるメソッド
@@ -229,6 +232,10 @@ public class PhotonManager : Photon.MonoBehaviour {
 			backButton.interactable = false;
 			PhotonNetwork.Instantiate("Player", new Vector3(1, 0.01f, 0), Quaternion.identity, 0);
 		}
+	}
+
+	void OnPhotonJoinRoomFailed() {
+		Debug.Log ("log : ルームの入室に失敗しました");
 	}
 
 	// リモートプレイヤーがルームに入室した時によばれるメソッド
