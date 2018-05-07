@@ -5,13 +5,8 @@ using UnityEngine.UI;
 
 public class ButtonScript : MonoBehaviour {
 
-	public static bool leftButtonPressed;
 	public static bool leftButtonPressing;
-	public static bool leftButtonUpped;
-	public static bool rightButtonPressed;
 	public static bool rightButtonPressing;
-	public static bool rightButtonUpped;
-
 	public static bool upButtonPressing;
 	public static bool downButtonPressed;
 	public static bool isGround;
@@ -39,12 +34,8 @@ public class ButtonScript : MonoBehaviour {
 
 
 	void Start () {
-		leftButtonPressed = false;
 		leftButtonPressing = false;
-		leftButtonUpped = false;
-		rightButtonPressed = false;
 		rightButtonPressing = false;
-		rightButtonUpped = false;
 		upButtonPressing = false;
 		downButtonPressed = false;
 		smallAttackButtonPressed = false;
@@ -54,7 +45,7 @@ public class ButtonScript : MonoBehaviour {
 	}
 	
 	void Update () {
-		if (PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
+		if (PhotonManager.phase == PhotonManager.PHASE.isPlaying || OfflineManager.isPlaying) {
 			if (30 < Input.mousePosition.x && Input.mousePosition.x < 290) {
 				if (220 < Input.mousePosition.y && Input.mousePosition.y < 280) {
 					UpButtonDown();
@@ -94,66 +85,58 @@ public class ButtonScript : MonoBehaviour {
 		}
 
 		if (smallAttackButtonPressed) {
-			smallAttackTimer = 1.0f;
+			smallAttackTimer = 0.5f;
+			smallAttackButton.interactable = false;
 		}
 		if (smallAttackTimer > 0) {
 			smallAttackTimer -= Time.deltaTime;
-			smallAttackButton.interactable = false;
 		} else {
-			smallAttackTimer = 0;
 			smallAttackButton.interactable = true;
 		}
 		if (bigAttackButtonPressed) {
-			bigAttackTimer = 1.0f;
+			bigAttackTimer = 0.7f;
+			bigAttackButton.interactable = false;
 		}
 		if (bigAttackTimer > 0) {
 			bigAttackTimer -= Time.deltaTime;
-			bigAttackButton.interactable = false;
 		} else {
-			bigAttackTimer = 0;
 			bigAttackButton.interactable = true;
 		}
 		if (skillButtonPressed) {
 			skillTimer = 1.0f;
+			skillButton.interactable = false;
 		}
 		if (skillTimer > 0) {
 			skillTimer -= Time.deltaTime;
-			skillButton.interactable = false;
 		} else {
-			skillTimer = 0;
 			skillButton.interactable = true;
 		}
 		if (avoidButtonPressed) {
 			avoidTimer = 1.0f;
+			avoidButton.interactable = false;
 		}
 		if (avoidTimer > 0) {
 			avoidTimer -= Time.deltaTime;
-			avoidButton.interactable = false;
 		} else {
-			avoidTimer = 0;
 			avoidButton.interactable = true;
 		}
 	}
 
 	public void LeftButtonDown() {
-		leftButtonPressed = true;
 		leftButtonPressing = true;
 		rightButtonPressing = false;
 	}
 
 	public void LeftButtoUp() {
-		leftButtonUpped = true;
 		leftButtonPressing = false;
 	}
 
 	public void RightButtonDown() {
-		rightButtonPressed = true;
 		rightButtonPressing = true;
 		leftButtonPressing = false;
 	}
 
 	public void RightButtonUp() {
-		rightButtonUpped = true;
 		rightButtonPressing = false;
 	}
 

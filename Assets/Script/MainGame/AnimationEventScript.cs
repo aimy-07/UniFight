@@ -7,6 +7,28 @@ public class AnimationEventScript : MonoBehaviour {
 	public BoxCollider smallAttackCol;
 	public BoxCollider bigAttackCol;
 
+	GameObject myPlayer;
+	GameObject enemyPlayer;
+	AudioSource myDamageSound;
+	AudioSource enemyDamageSound;
+
+
+	void Start () {
+		if (PhotonManager.phase == PhotonManager.PHASE.other) {
+			myPlayer = GameObject.FindWithTag("myPlayer").gameObject;
+			enemyPlayer = GameObject.FindWithTag("enemyPlayer").gameObject;
+			myDamageSound = myPlayer.transform.Find("audio").gameObject.GetComponents<AudioSource>()[6];
+			enemyDamageSound = enemyPlayer.transform.Find("audio").gameObject.GetComponents<AudioSource>()[6];
+		}
+	}
+	
+	void Update () {
+		if (PhotonManager.phase != PhotonManager.PHASE.other) {
+			myPlayer = GameObject.FindWithTag("myPlayer").gameObject;
+			myDamageSound = myPlayer.transform.Find("audio").gameObject.GetComponents<AudioSource>()[6];
+		}
+	}
+
 	void SmallAttackStart() {
 		smallAttackCol.enabled = true;
 	}
@@ -24,19 +46,28 @@ public class AnimationEventScript : MonoBehaviour {
 	}
 
 	void Skill() {
-		if (transform.root.gameObject.tag == "myPlayer") {
-			if (GameObject.FindWithTag("enemyPlayer").gameObject != null) {
-				if (Mathf.Abs(Vector3.Distance(transform.position, GameObject.FindWithTag("enemyPlayer").gameObject.transform.position)) < 2) {
+		if (PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
+			// 通信対戦モード
+			if (Mathf.Abs(Vector3.Distance(myPlayer.transform.position, GameObject.FindWithTag("enemyPlayer").gameObject.transform.position)) < 4) {
+				if (transform.root.gameObject.tag == "myPlayer") {
 					Debug.Log("スキル 成功！");
-					GameObject.FindWithTag("myPlayer").gameObject.SendMessage("SkillDamaged");
-
+				} else {
+					Debug.Log("ダメージ！スキル!!");
+					myDamageSound.Play();
+					myPlayer.SendMessage("Damaged", PhotonManager.SkillDamage);
 				}
 			}
-		} else {
-			if (GameObject.FindWithTag("myPlayer").gameObject != null) {
-				if (Mathf.Abs(Vector3.Distance(transform.position, GameObject.FindWithTag("myPlayer").gameObject.transform.position)) < 2) {
+		} else if (OfflineManager.isPlaying) {
+			// シングルプレイモード
+			if (Mathf.Abs(Vector3.Distance(myPlayer.transform.position, enemyPlayer.transform.position)) < 4) {
+				if (transform.root.gameObject.tag == "myPlayer") {
+					Debug.Log("スキル 成功！");
+					enemyDamageSound.Play();
+					enemyPlayer.SendMessage("Damaged", PhotonManager.SkillDamage);
+				} else {
 					Debug.Log("ダメージ！スキル!!");
-					GameObject.FindWithTag("myPlayer").gameObject.SendMessage("Damaged", PhotonManager.SkillDamage);
+					myDamageSound.Play();
+					myPlayer.SendMessage("Damaged", PhotonManager.SkillDamage);
 				}
 			}
 		}

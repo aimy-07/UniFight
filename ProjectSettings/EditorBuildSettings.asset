@@ -21,8 +21,14 @@ EditorBuildSettings:
     path: Assets/Scenes/Record.unity
     guid: 6e4d79f5500df4c7a85643c220757528
   - enabled: 1
-    path: Assets/Scenes/OnlineMain.unity
+    path: Assets/Scenes/Main.unity
     guid: f6abf826dfc9c49b1994ed9662a14e4b
   - enabled: 1
-    path: Assets/Scenes/OnlineResult.unity
+    path: Assets/Scenes/Result.unity
     guid: fa81bd2998c5b47f88edddec82ac7536
+  - enabled: 1
+    path: Assets/Scenes/OfflineMain.unity
+    guid: f6ca624bd587c4b058ef219f7cc371b1
+  - enabled: 1
+    path: Assets/Scenes/OfflineResult.unity
+    guid: a953275dbcf224cee9e7c80006d31e02

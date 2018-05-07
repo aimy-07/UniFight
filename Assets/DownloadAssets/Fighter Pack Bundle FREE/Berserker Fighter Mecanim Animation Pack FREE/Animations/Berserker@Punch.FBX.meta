@@ -179,14 +179,14 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.24641834
+      - time: 0.27197745
         functionName: BigAttackStart
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.40114614
+      - time: 0.55450076
         functionName: BigAttackEnd
         data: 
         objectReferenceParameter: {instanceID: 0}

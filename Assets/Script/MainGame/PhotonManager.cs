@@ -10,7 +10,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 	public enum PHASE{
 		isConnecting, isReady, isStarting, isPlaying, isEnded, other
 	}
-	public static PHASE phase;
+	public static PHASE phase = PHASE.other;
 	bool roomIn;
 	
 	[SerializeField] Text statusText;
@@ -26,15 +26,23 @@ public class PhotonManager : Photon.MonoBehaviour {
 	[SerializeField] GameObject mainCanvas;
 	[SerializeField] Animator battleStartPanelAnim;
 
-	public static float MAXHP = 20;
+	public static int MAXHP = 50;
 	RectTransform myHpbarRect;
 	RectTransform enemyHpbarRect;
 	PlayerController myPlayerPlayerController;
 	PlayerController enemyPlayerPlayerController;
+	public static int smallAttackDamage = 3;
+	public static int bigAttackDamage = 5;
+	public static int SkillDamage = 5;
+	public static int SkillOwnDamage = 7;
 
-	public static float smallAttackDamage = 3;
-	public static float bigAttackDamage = 5;
-	public static float SkillDamage = 10;
+	public static int MAXAP = 30;
+	RectTransform myApbarRect;
+	RectTransform enemyApbarRect;
+	public static float AUTE_AP_INTERVAL = 3f;
+	public static int SmallAttackAP = 3;
+	public static int BigAttackAP = 5;
+	public static int AvoidAP = 1;
 	
 	[SerializeField] GameObject resultCanvas;
 	[SerializeField] Text resultText;
@@ -47,6 +55,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 
 	void Start() {
 		phase = PHASE.isConnecting;
+		OfflineManager.isPlaying = false;
 
 		matchingCanvas.SetActive(true);
 		statusText.text = "";
@@ -67,8 +76,10 @@ public class PhotonManager : Photon.MonoBehaviour {
 			phase = PHASE.isStarting;
 		}
 		if (phase == PHASE.isPlaying) {
-			myHpbarRect.localScale = new Vector3(myPlayerPlayerController.hp / MAXHP, 1, 1);
-			enemyHpbarRect.localScale = new Vector3(enemyPlayerPlayerController.hp / MAXHP, 1, 1);
+			myHpbarRect.localScale = new Vector3((float)myPlayerPlayerController.hp / MAXHP, 1, 1);
+			enemyHpbarRect.localScale = new Vector3((float)enemyPlayerPlayerController.hp / MAXHP, 1, 1);
+			myApbarRect.localScale = new Vector3((float)myPlayerPlayerController.ap / MAXAP, 1, 1);
+			enemyApbarRect.localScale = new Vector3((float)enemyPlayerPlayerController.ap / MAXAP, 1, 1);
 		}
 	}
 
@@ -86,13 +97,22 @@ public class PhotonManager : Photon.MonoBehaviour {
 		if (GameObject.FindWithTag("myPlayer").transform.position.x < 0) {
 			myHpbarRect = GameObject.Find("1PHPbar").GetComponent<RectTransform>();
 			enemyHpbarRect = GameObject.Find("2PHPbar").GetComponent<RectTransform>();
+			myApbarRect = GameObject.Find("1PAPbar").GetComponent<RectTransform>();
+			enemyApbarRect = GameObject.Find("2PAPbar").GetComponent<RectTransform>();
+			GameObject.Find("1Pname").GetComponent<Text>().text = GameObject.FindWithTag("myPlayer").GetComponent<PlayerController>().playerName;
+			GameObject.Find("2Pname").GetComponent<Text>().text = GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>().playerName;
 		} else  {
 			myHpbarRect = GameObject.Find("2PHPbar").GetComponent<RectTransform>();
 			enemyHpbarRect = GameObject.Find("1PHPbar").GetComponent<RectTransform>();
+			myApbarRect = GameObject.Find("2PAPbar").GetComponent<RectTransform>();
+			enemyApbarRect = GameObject.Find("1PAPbar").GetComponent<RectTransform>();
+			GameObject.Find("2Pname").GetComponent<Text>().text = GameObject.FindWithTag("myPlayer").GetComponent<PlayerController>().playerName;
+			GameObject.Find("1Pname").GetComponent<Text>().text = GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>().playerName;
 		}
 		phase = PHASE.isPlaying;
 	}
 
+	// どちらかのHPが0になったら呼ばれる
 	void BattleEnd(string losePlayerTag) {
 		phase = PHASE.isEnded;
 		if (losePlayerTag == "myPlayer") {
@@ -236,6 +256,8 @@ public class PhotonManager : Photon.MonoBehaviour {
 
 	void OnPhotonJoinRoomFailed() {
 		Debug.Log ("log : ルームの入室に失敗しました");
+		Debug.Log ("log : 再度ルーム入室を試みます");
+		PhotonNetwork.JoinRandomRoom();
 	}
 
 	// リモートプレイヤーがルームに入室した時によばれるメソッド

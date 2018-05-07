@@ -13,6 +13,9 @@ public class TitleManager : MonoBehaviour {
 	}
 	
 	void Start() {
+		PhotonManager.phase = PhotonManager.PHASE.other;
+		OfflineManager.isPlaying = false;
+
 		int chara = PlayerPrefs.GetInt("chara", 0);
 		int hairColor = PlayerPrefs.GetInt("hair", 1);
 		int eyeColor = PlayerPrefs.GetInt("eye", 3);
@@ -22,6 +25,7 @@ public class TitleManager : MonoBehaviour {
 		charaObj.transform.position = new Vector3(-0.5f, 0, 0);
 		charaObj.transform.eulerAngles = new Vector3(0, 140, 0);
 		charaObj.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+		Destroy(charaObj.GetComponent<AnimationEventScript>());
 
 		if (chara == 0) {
 			charaObj.transform.Find("costume").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/costume_unity" + costumeColor) as Material;
@@ -56,6 +60,10 @@ public class TitleManager : MonoBehaviour {
 		SceneManager.LoadScene("Main");
 	}
 
+	void toOfflinePlay() {
+		SceneManager.LoadScene("OfflineMain");
+	}
+
 	void toRecord() {
 		SceneManager.LoadScene("Record");
 	}
@@ -68,6 +76,11 @@ public class TitleManager : MonoBehaviour {
 	public void toMatchingButton() {
 		Invoke("toMatching", 0.5f);
 		GameObject.Find("StartButtonFrame").GetComponent<Animation>().Play();
+	}
+
+	public void toOfflinePlayButton() {
+		Invoke("toOfflinePlay", 0.5f);
+		GameObject.Find("OfflineStartButtonFrame").GetComponent<Animation>().Play();
 	}
 
 	public void toRecordButton() {

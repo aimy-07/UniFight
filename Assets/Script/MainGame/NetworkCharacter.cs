@@ -8,8 +8,30 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 	float myPos = 0;
 	Vector3 correctPlayerPos;
     Quaternion correctPlayerRot;
- 
 
+	ParticleSystem psSmallLeft;
+	ParticleSystem psSmallRight;
+	ParticleSystem psBigLeft;
+	ParticleSystem psBigRight;
+	GameObject psSkill;
+	GameObject psJump;
+	AudioSource[] audios_SE = new AudioSource[7];
+
+
+
+	void Start() {
+		psSmallLeft = transform.Find("ps_SmallLeft").GetComponent<ParticleSystem>();
+		psSmallRight = transform.Find("ps_SmallRight").GetComponent<ParticleSystem>();
+		psBigLeft = transform.Find("ps_BigLeft").GetComponent<ParticleSystem>();
+		psBigRight = transform.Find("ps_BigRight").GetComponent<ParticleSystem>();
+		psJump = GameObject.Find("ps_Jump");
+		psSkill = GameObject.Find("ps_Skill");
+		audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
+		// for (int i = 0; i < 7; i++) {
+		// 	audios_SE[i].volume = 1.0f;
+		// }
+	}
+ 
 	void Update() {
 		if (gameObject.tag == "enemyPlayer") {
 			myPos = GameObject.FindWithTag("myPlayer").gameObject.transform.position.x;
@@ -18,12 +40,12 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 		}
 	}
  
-
 	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
 		if (stream.isWriting) {
 			PlayerController playerController = GetComponent<PlayerController>();
 
-			//キャラの見た目
+			//キャラの見た目とプレイヤー名
+			stream.SendNext(playerController.playerName);
 			stream.SendNext(playerController.chara);
 			stream.SendNext(playerController.hairColor);
 			stream.SendNext(playerController.eyeColor);
@@ -32,12 +54,15 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			stream.SendNext(transform.position);
 			stream.SendNext(transform.rotation);
 			stream.SendNext(GetComponent<Rigidbody>().velocity);
-			//HP
+			//HPとAP
 			stream.SendNext(playerController.hp);
+			stream.SendNext(playerController.ap);
 			
 			//アニメーション
+			if (PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
 			stream.SendNext(playerController.idleFlg);
 			stream.SendNext(playerController.walkFlg);
+			stream.SendNext(playerController.jumpFlg);
 			stream.SendNext(playerController.jumpDownFlg);
 			stream.SendNext(playerController.smallAttackFlg);
 			stream.SendNext(playerController.bigAttackFlg);
@@ -47,6 +72,7 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			stream.SendNext(playerController.deathFlg);
 			playerController.idleFlg = false;
 			playerController.walkFlg = false;
+			playerController.jumpFlg = false;
 			playerController.jumpDownFlg = false;
 			playerController.smallAttackFlg = false;
 			playerController.bigAttackFlg = false;
@@ -54,13 +80,16 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			playerController.avoidFlg = false;
 			playerController.damageFlg = false;
 			playerController.deathFlg = false;
+			}
 
 		} else {
 			Debug.Log("Receivred : " + gameObject.tag);
 			PlayerController playerController = GetComponent<PlayerController>();
 
-			//キャラの見た目
-			playerController.chara = (int)stream.ReceiveNext();
+			//キャラの見た目とプレイヤー名
+			playerController.playerName = (string)stream.ReceiveNext();
+			int chara = (int)stream.ReceiveNext();
+			playerController.chara = chara;
 			playerController.hairColor = (int)stream.ReceiveNext();
 			playerController.eyeColor = (int)stream.ReceiveNext();
 			playerController.costumeColor = (int)stream.ReceiveNext();
@@ -70,13 +99,16 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			correctPlayerPos = (Vector3)stream.ReceiveNext ();
             correctPlayerRot = (Quaternion)stream.ReceiveNext ();
 			GetComponent<Rigidbody>().velocity = (Vector3)stream.ReceiveNext();
-			//HP
-			playerController.hp = (float)stream.ReceiveNext();
+			//HPとAP
+			playerController.hp = (int)stream.ReceiveNext();
+			playerController.ap = (int)stream.ReceiveNext();
 			
 			//アニメーション
+			if (PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
 			Animator animator = transform.Find("UTC_Default").gameObject.GetComponent<Animator>();
 			bool idleFlg = (bool)stream.ReceiveNext();
 			bool walkFlg = (bool)stream.ReceiveNext();
+			bool jumpFlg = (bool)stream.ReceiveNext();
 			bool jumpDownFlg = (bool)stream.ReceiveNext();
 			bool smallAttackFlg = (bool)stream.ReceiveNext();
 			bool bigAttackFlg = (bool)stream.ReceiveNext();
@@ -90,41 +122,57 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			if (walkFlg) {
         		animator.SetTrigger("Walk");
       		}
+			if (jumpFlg) {
+        		psJump.transform.position = new Vector3(transform.position.x, -0.2f, 0);
+				psJump.GetComponent<ParticleSystem>().Play();
+				audios_SE[1].Play();
+      		}
 			if (jumpDownFlg) {
         		animator.SetTrigger("JumpDown");
       		}
       		if (smallAttackFlg) {
         		animator.SetTrigger("SmallAttack");
+				if (transform.position.x > myPos) {
+					psSmallLeft.Play();
+				} else {
+					psSmallRight.Play();
+				} 
+				audios_SE[2].Play();
       		}
 			if (bigAttackFlg) {
         		animator.SetTrigger("BigAttack");
+				if (transform.position.x > myPos) {
+					psBigLeft.Play();
+				} else {
+					psBigRight.Play();
+				} 
+				audios_SE[2].Play();
       		}
 			if (skillFlg) {
         		animator.SetTrigger("Skill");
+				psSkill.transform.position = new Vector3(transform.position.x, 0, 0);
+				psSkill.GetComponent<ParticleSystem>().Play();
+				audios_SE[3].Play();
+				audios_SE[4].Play(44100 / 2);
       		}
 			if (avoidFlg) {
-        		if (transform.position.x > myPos) {
-					Instantiate(Resources.Load("AvoidEffect/AvoidEffectRight" + playerController.chara) as GameObject, new Vector3(transform.position.x, transform.position.y, -1), Quaternion.identity);
-					if (transform.position.x > 3 - 1) {
-						transform.position = new Vector3(3, transform.position.y, 0);
-					} else {
-						transform.position = new Vector3(transform.position.x + 1, transform.position.y, 0);
-					}
+        		if (transform.position.x > 0) { 
+					transform.position = new Vector3(-3, transform.position.y, 0);
+					Instantiate(Resources.Load("AvoidEffect/AvoidEffectLeft" + chara) as GameObject, new Vector3(-2, transform.position.y, -1), Quaternion.identity);
 				} else {
-					Instantiate(Resources.Load("AvoidEffect/AvoidEffectLeft" + playerController.chara) as GameObject, new Vector3(transform.position.x, transform.position.y, -1), Quaternion.identity);
-					if (transform.position.x < -3 + 1) {
-						transform.position = new Vector3(-3, transform.position.y, 0);
-					} else {
-						transform.position = new Vector3(transform.position.x - 1, transform.position.y, 0);
-					}
+					transform.position = new Vector3(3, transform.position.y, 0);
+					Instantiate(Resources.Load("AvoidEffect/AvoidEffectRight" + chara) as GameObject, new Vector3(2, transform.position.y, -1), Quaternion.identity);
 				}
+				audios_SE[5].Play();
       		}
 			if (damageFlg) {
+				audios_SE[6].Play();
         		animator.SetTrigger("Damage");
       		}
 			if (deathFlg) {
         		animator.SetTrigger("Death");
       		}
+			}
 		}
 	}
 }

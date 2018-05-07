@@ -70,6 +70,7 @@ public class ResultManager : MonoBehaviour {
 		GameObject charaObj = Instantiate(Resources.Load("CharaPrefabs/chara" + chara) as GameObject);
 		charaObj.transform.position = new Vector3(-0.4f, 0, 0);
 		charaObj.transform.eulerAngles = new Vector3(0, 180, 0);
+		Destroy(charaObj.GetComponent<AnimationEventScript>());
 
 		if (chara == 0) {
 			charaObj.transform.Find("costume").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/costume_unity" + costumeColor) as Material;

@@ -57,7 +57,7 @@ GameObject:
   - component: {fileID: 114296000153372184}
   - component: {fileID: 114315919868282670}
   m_Layer: 5
-  m_Name: RackingItem
+  m_Name: RankingItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
