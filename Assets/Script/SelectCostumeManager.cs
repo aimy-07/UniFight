@@ -24,6 +24,8 @@ public class SelectCostumeManager : MonoBehaviour {
 
 	[SerializeField] Button[] buttons;
 
+	AudioSource[] audio_systemSE = new AudioSource[2];
+
 
 
 
@@ -43,6 +45,11 @@ public class SelectCostumeManager : MonoBehaviour {
 		SetEyeColor();
 		SetCostumeColor();
 		SetButtons();
+
+		audio_systemSE = GameObject.Find("audio").GetComponents<AudioSource>();
+		// for (int i = 0; i < audio_systemSE.Length; i++) {
+		// 	audio_systemSE[i].volume = 1.0f;
+		// }
 	}
 	
 	void Update () {
@@ -131,6 +138,7 @@ public class SelectCostumeManager : MonoBehaviour {
 			SetEyeColor();
 			SetCostumeColor();
 			SetButtons();
+			audio_systemSE[0].Play();
 		}
 	}
 
@@ -142,6 +150,7 @@ public class SelectCostumeManager : MonoBehaviour {
 			SetEyeColor();
 			SetCostumeColor();
 			SetButtons();
+			audio_systemSE[0].Play();
 		}
 	}
 
@@ -150,6 +159,7 @@ public class SelectCostumeManager : MonoBehaviour {
 			hairColor++;
 			SetHairColor();
 			SetButtons();
+			audio_systemSE[0].Play();
 		}
 	}
 
@@ -158,6 +168,7 @@ public class SelectCostumeManager : MonoBehaviour {
 			hairColor--;
 			SetHairColor();
 			SetButtons();
+			audio_systemSE[0].Play();
 		}
 	}
 
@@ -166,6 +177,7 @@ public class SelectCostumeManager : MonoBehaviour {
 			eyeColor++;
 			SetEyeColor();
 			SetButtons();
+			audio_systemSE[0].Play();
 		}
 	}
 
@@ -174,6 +186,7 @@ public class SelectCostumeManager : MonoBehaviour {
 			eyeColor--;
 			SetEyeColor();
 			SetButtons();
+			audio_systemSE[0].Play();
 		}
 	}
 
@@ -182,6 +195,7 @@ public class SelectCostumeManager : MonoBehaviour {
 			costumeColor++;
 			SetCostumeColor();
 			SetButtons();
+			audio_systemSE[0].Play();
 		}
 	}
 
@@ -190,6 +204,7 @@ public class SelectCostumeManager : MonoBehaviour {
 			costumeColor--;
 			SetCostumeColor();
 			SetButtons();
+			audio_systemSE[0].Play();
 		}
 	}
 
@@ -241,6 +256,11 @@ public class SelectCostumeManager : MonoBehaviour {
 	}
 
 	public void BackButton() {
+		Invoke("toTitle", 0.2f);
+		audio_systemSE[1].Play();
+	}
+
+	void toTitle() {
 		SceneManager.LoadScene("Title");
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class OfflineEnemyController : MonoBehaviour {
 
@@ -22,12 +23,15 @@ public class OfflineEnemyController : MonoBehaviour {
 	[SerializeField] ParticleSystem psBigRight;
 	[SerializeField] GameObject psSkill;
 	[SerializeField] GameObject psJump;
+	[SerializeField] ParticleSystem psHit;
 	AudioSource[] audios_SE = new AudioSource[7];
 
 	public float hp;
-	public RectTransform hpbarRect;
+	[SerializeField] Image hpbar;
+	[SerializeField] Text hpbarText;
 	public int ap;
-	[SerializeField] RectTransform apbarRect;
+	[SerializeField] Image apbar;
+	[SerializeField] Text apbarText;
 
 	MOVE_STATE moveState = MOVE_STATE.stopping;
 	enum MOVE_STATE {
@@ -77,8 +81,10 @@ public class OfflineEnemyController : MonoBehaviour {
 			if (hp == 0) {
 				GameObject.Find("OfflineManager").SendMessage("BattleEnd", gameObject.tag);
 			}
-			hpbarRect.localScale = new Vector3((float)hp / PhotonManager.MAXHP, 1, 1);
-			apbarRect.localScale = new Vector3((float)ap / PhotonManager.MAXAP, 1, 1);
+			hpbar.fillAmount = (float)hp / PhotonManager.MAXHP;
+			hpbarText.text = "HP " + hp + " / " + PhotonManager.MAXHP;
+			apbar.fillAmount = (float)ap / PhotonManager.MAXAP;
+			apbarText.text = "AP " + ap + " / " + PhotonManager.MAXAP;
 			AP_PROB = (float)ap / PhotonManager.MAXAP;
 
 			/* ---------------------------------
@@ -139,11 +145,6 @@ public class OfflineEnemyController : MonoBehaviour {
 						timer = 0;
 					} else {
 						timer += Time.deltaTime;
-						// ジャンプ時確率で急降下
-						if (!isGround && Random.Range(0.0f, 1.0f) < JUMP_PROB / 2) {
-        	    			rigid.AddForce(Vector3.down * flap);
-							animator.SetTrigger("JumpDown");
-						}
 					}
 				}
 			}
@@ -200,7 +201,7 @@ public class OfflineEnemyController : MonoBehaviour {
 							psSkill.transform.position = new Vector3(transform.position.x, 0, 0);
 							psSkill.GetComponent<ParticleSystem>().Play();
 							audios_SE[3].Play();
-							audios_SE[4].Play(44100 / 2);
+							audios_SE[4].PlayDelayed(0.5f);
 							skillFlg = true;
 							moveState = MOVE_STATE.stopping;
 							idleFlg = true;
@@ -371,6 +372,7 @@ public class OfflineEnemyController : MonoBehaviour {
 
 	void Damaged(int damage) {
 		hp -= damage;
+		psHit.Play();
 		if (hp > 0) {
 			animator.SetTrigger("Damage");
 		} else {

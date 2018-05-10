@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BigAttack : MonoBehaviour {
 
@@ -10,7 +11,7 @@ public class BigAttack : MonoBehaviour {
 	AudioSource enemyDamageSound;
 
 	void Start () {
-		if (PhotonManager.phase == PhotonManager.PHASE.other) {
+		if (SceneManager.GetActiveScene().name == "OfflineMain") {
 			myPlayer = GameObject.FindWithTag("myPlayer").gameObject;
 			enemyPlayer = GameObject.FindWithTag("enemyPlayer").gameObject;
 			myDamageSound = myPlayer.transform.Find("audio").gameObject.GetComponents<AudioSource>()[6];
@@ -19,7 +20,7 @@ public class BigAttack : MonoBehaviour {
 	}
 	
 	void Update () {
-		if (PhotonManager.phase != PhotonManager.PHASE.other) {
+		if (SceneManager.GetActiveScene().name == "Main") {
 			myPlayer = GameObject.FindWithTag("myPlayer").gameObject;
 			myDamageSound = myPlayer.transform.Find("audio").gameObject.GetComponents<AudioSource>()[6];
 		}

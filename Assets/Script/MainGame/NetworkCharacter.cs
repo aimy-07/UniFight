@@ -15,6 +15,7 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 	ParticleSystem psBigRight;
 	GameObject psSkill;
 	GameObject psJump;
+	ParticleSystem psHit;
 	AudioSource[] audios_SE = new AudioSource[7];
 
 
@@ -26,6 +27,7 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 		psBigRight = transform.Find("ps_BigRight").GetComponent<ParticleSystem>();
 		psJump = GameObject.Find("ps_Jump");
 		psSkill = GameObject.Find("ps_Skill");
+		psHit = transform.Find("ps_Hit").GetComponent<ParticleSystem>();
 		audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
 		// for (int i = 0; i < 7; i++) {
 		// 	audios_SE[i].volume = 1.0f;
@@ -63,7 +65,6 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			stream.SendNext(playerController.idleFlg);
 			stream.SendNext(playerController.walkFlg);
 			stream.SendNext(playerController.jumpFlg);
-			stream.SendNext(playerController.jumpDownFlg);
 			stream.SendNext(playerController.smallAttackFlg);
 			stream.SendNext(playerController.bigAttackFlg);
 			stream.SendNext(playerController.skillFlg);
@@ -73,7 +74,6 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			playerController.idleFlg = false;
 			playerController.walkFlg = false;
 			playerController.jumpFlg = false;
-			playerController.jumpDownFlg = false;
 			playerController.smallAttackFlg = false;
 			playerController.bigAttackFlg = false;
 			playerController.skillFlg = false;
@@ -109,7 +109,6 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			bool idleFlg = (bool)stream.ReceiveNext();
 			bool walkFlg = (bool)stream.ReceiveNext();
 			bool jumpFlg = (bool)stream.ReceiveNext();
-			bool jumpDownFlg = (bool)stream.ReceiveNext();
 			bool smallAttackFlg = (bool)stream.ReceiveNext();
 			bool bigAttackFlg = (bool)stream.ReceiveNext();
 			bool skillFlg = (bool)stream.ReceiveNext();
@@ -126,9 +125,6 @@ public class NetworkCharacter : Photon.MonoBehaviour {
         		psJump.transform.position = new Vector3(transform.position.x, -0.2f, 0);
 				psJump.GetComponent<ParticleSystem>().Play();
 				audios_SE[1].Play();
-      		}
-			if (jumpDownFlg) {
-        		animator.SetTrigger("JumpDown");
       		}
       		if (smallAttackFlg) {
         		animator.SetTrigger("SmallAttack");
@@ -153,7 +149,7 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 				psSkill.transform.position = new Vector3(transform.position.x, 0, 0);
 				psSkill.GetComponent<ParticleSystem>().Play();
 				audios_SE[3].Play();
-				audios_SE[4].Play(44100 / 2);
+				audios_SE[4].PlayDelayed(0.5f);
       		}
 			if (avoidFlg) {
         		if (transform.position.x > 0) { 
@@ -166,10 +162,12 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 				audios_SE[5].Play();
       		}
 			if (damageFlg) {
+				psHit.Play();
 				audios_SE[6].Play();
         		animator.SetTrigger("Damage");
       		}
 			if (deathFlg) {
+				psHit.Play();
         		animator.SetTrigger("Death");
       		}
 			}

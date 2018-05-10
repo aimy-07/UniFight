@@ -13,9 +13,14 @@ public class InputNameManager : MonoBehaviour {
 	[SerializeField] InputField inputField;
 	[SerializeField] Button okButton;
 	[SerializeField] GameObject errorText;
+	AudioSource[] audio_systemSE = new AudioSource[2];
 
 	void Start () {
 		errorText.SetActive(false);
+		audio_systemSE = GameObject.Find("audio").GetComponents<AudioSource>();
+		// for (int i = 0; i < audio_systemSE.Length; i++) {
+		// 	audio_systemSE[i].volume = 1.0f;
+		// }
 	}
 
 	void Update() {
@@ -42,8 +47,10 @@ public class InputNameManager : MonoBehaviour {
 				PlayerPrefs.SetInt("LoseCount", 0);
 				PlayerPrefs.SetInt("FirstOpen", 1);
 				Invoke("toTitle", 0.5f);
+				audio_systemSE[0].Play();
 			} else {
 				errorText.SetActive(true);
+				audio_systemSE[1].Play();
 			}
 		});
 		GameObject.Find("OkButton").GetComponent<Animation>().Play();

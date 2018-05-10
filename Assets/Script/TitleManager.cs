@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class TitleManager : MonoBehaviour {
 
+	AudioSource[] audio_systemSE = new AudioSource[1];
+
 	void Awake()　{
 		// PC向けビルドだったらサイズ変更
 		if (Application.platform == RuntimePlatform.WindowsPlayer ||　Application.platform == RuntimePlatform.OSXPlayer)　{
@@ -50,6 +52,11 @@ public class TitleManager : MonoBehaviour {
 			charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + eyeColor) as Material;
 			break;
 		}
+
+		audio_systemSE = GameObject.Find("audio").GetComponents<AudioSource>();
+		// for (int i = 0; i < audio_systemSE.Length; i++) {
+		// 	audio_systemSE[i].volume = 1.0f;
+		// }
 	}
 
 	void toSelectCostume() {
@@ -69,22 +76,26 @@ public class TitleManager : MonoBehaviour {
 	}
 
 	public void toSelectCostumeButton() {
-		Invoke("toSelectCostume", 0.5f);
+		Invoke("toSelectCostume", 0.4f);
 		GameObject.Find("SelectCostumeButtonFrame").GetComponent<Animation>().Play();
+		audio_systemSE[0].Play();
 	}
 
 	public void toMatchingButton() {
-		Invoke("toMatching", 0.5f);
+		Invoke("toMatching", 0.4f);
 		GameObject.Find("StartButtonFrame").GetComponent<Animation>().Play();
+		audio_systemSE[0].Play();
 	}
 
 	public void toOfflinePlayButton() {
-		Invoke("toOfflinePlay", 0.5f);
+		Invoke("toOfflinePlay", 0.4f);
 		GameObject.Find("OfflineStartButtonFrame").GetComponent<Animation>().Play();
+		audio_systemSE[0].Play();
 	}
 
 	public void toRecordButton() {
-		Invoke("toRecord", 0.5f);
+		Invoke("toRecord", 0.4f);
 		GameObject.Find("RankingButtonFrame").GetComponent<Animation>().Play();
+		audio_systemSE[0].Play();
 	}
 }

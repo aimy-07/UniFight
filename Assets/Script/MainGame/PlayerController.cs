@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour {
     public float scroll = 3f;
     float direction = 0f;
 	public bool isGround = true;
+	public Joystick joystick = null;
 
 	Rigidbody rigid;
 	Animator animator;
@@ -21,13 +22,14 @@ public class PlayerController : MonoBehaviour {
 	ParticleSystem psBigRight;
 	GameObject psSkill;
 	GameObject psJump;
+	ParticleSystem psAPwarning;
+	ParticleSystem psHit;
 	AudioSource[] audios_SE = new AudioSource[7];
 
 	PhotonView myPhotonView;
 	public bool idleFlg;
 	public bool walkFlg;
 	public bool jumpFlg;
-	public bool jumpDownFlg;
 	public bool smallAttackFlg;
 	public bool bigAttackFlg;
 	public bool skillFlg;
@@ -70,6 +72,8 @@ public class PlayerController : MonoBehaviour {
 		psBigRight = transform.Find("ps_BigRight").GetComponent<ParticleSystem>();
 		psJump = GameObject.Find("ps_Jump");
 		psSkill = GameObject.Find("ps_Skill");
+		psAPwarning = GameObject.Find("ps_APwarning").GetComponent<ParticleSystem>();
+		psHit = transform.Find("ps_Hit").GetComponent<ParticleSystem>();
 		audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
 		// for (int i = 0; i < 7; i++) {
 		// 	audios_SE[i].volume = 1.0f;
@@ -201,32 +205,34 @@ public class PlayerController : MonoBehaviour {
 			/* ---------------------------------
 				左右の移動
 			---------------------------------- */
-			if (ButtonScript.rightButtonPressing) {
+			if (joystick.Position.x > 0.1f) {
 				if (transform.position.x < 3) {
-					direction = 1f;
+					direction = joystick.Position.x;
 				} else {
 					direction = 0;
 				}
-      		} else if (ButtonScript.leftButtonPressing) {
+      		} else if (joystick.Position.x < -0.1f) {
       	    	if (transform.position.x > -3) {
-					direction = -1f;
+					direction = joystick.Position.x;
 				} else {
 					direction = 0;
 				}
         	} else {
-        	    direction = 0f;
-        	}
+				direction = 0;
+			}
         	rigid.velocity = new Vector3(scroll * direction, rigid.velocity.y, 0);
 
 			/* ---------------------------------
 				移動アニメーション
 			---------------------------------- */
-			if (ButtonScript.leftButtonPressing || ButtonScript.rightButtonPressing) {
+			if (joystick.Position.x < -0.1f || 0.1f < joystick.Position.x) {
+				walkFlg = true;
 				animator.SetTrigger("Walk");
 				if (!audios_SE[0].isPlaying) {
 					audios_SE[0].Play();
 				}
 			} else {
+				idleFlg = true;
 				animator.SetTrigger("Idle");
 				if (audios_SE[0].isPlaying) {
 					audios_SE[0].Stop();
@@ -236,8 +242,7 @@ public class PlayerController : MonoBehaviour {
 			/* ---------------------------------
 				ジャンプ
 			---------------------------------- */
-			ButtonScript.isGround = isGround;
-			if (ButtonScript.upButtonPressing && isGround) {
+			if (joystick.Position.y > 0.1f && isGround) {
 				jumpFlg = true;
         	    rigid.AddForce(Vector3.up * flap);
 				isGround = false;
@@ -247,21 +252,11 @@ public class PlayerController : MonoBehaviour {
         	}
 
 			/* ---------------------------------
-				急降下
-			---------------------------------- */
-			if (ButtonScript.downButtonPressed && !isGround) {
-				jumpDownFlg = true;
-        	    rigid.AddForce(Vector3.down * flap);
-				animator.SetTrigger("JumpDown");
-				ButtonScript.downButtonPressed = false;
-        	}
-
-			/* ---------------------------------
 				弱攻撃
 			---------------------------------- */
 			if (ButtonScript.smallAttackButtonPressed) {
-				smallAttackFlg = true;
 				if (ap >= PhotonManager.SmallAttackAP) {
+					smallAttackFlg = true;
 					ap -= PhotonManager.SmallAttackAP;
 					animator.SetTrigger("SmallAttack");
 					if (transform.position.x > enemyPos) {
@@ -271,7 +266,7 @@ public class PlayerController : MonoBehaviour {
 					} 
 					audios_SE[2].Play();
 				} else {
-					// AP不足
+					psAPwarning.Play();
 				}
 				ButtonScript.smallAttackButtonPressed = false;
        		}
@@ -280,8 +275,8 @@ public class PlayerController : MonoBehaviour {
 				強攻撃
 			---------------------------------- */
 			if (ButtonScript.bigAttackButtonPressed) {
-				bigAttackFlg = true;
 				if (ap >= PhotonManager.BigAttackAP) {
+					bigAttackFlg = true;
 					ap -= PhotonManager.BigAttackAP;
 					animator.SetTrigger("BigAttack");
 					if (transform.position.x > enemyPos) {
@@ -291,7 +286,7 @@ public class PlayerController : MonoBehaviour {
 					} 
 					audios_SE[2].Play();
 				} else {
-					// AP不足
+					psAPwarning.Play();
 				}
 				ButtonScript.bigAttackButtonPressed = false;
         	}
@@ -300,16 +295,16 @@ public class PlayerController : MonoBehaviour {
 				スキル
 			---------------------------------- */
 			if (ButtonScript.skillButtonPressed) {
-				skillFlg = true;
 				if (hp > PhotonManager.SkillOwnDamage) {
+					skillFlg = true;
 					hp -= PhotonManager.SkillOwnDamage;
 					animator.SetTrigger("Skill");
 					psSkill.transform.position = new Vector3(transform.position.x, 0, 0);
 					psSkill.GetComponent<ParticleSystem>().Play();
 					audios_SE[3].Play();
-					audios_SE[4].Play(44100 / 2);
+					audios_SE[4].PlayDelayed(0.5f);
 				} else {
-					// HP不足
+					psAPwarning.Play();
 				}
 				ButtonScript.skillButtonPressed = false;
        		}
@@ -318,8 +313,8 @@ public class PlayerController : MonoBehaviour {
 				回避
 			---------------------------------- */
 			if (ButtonScript.avoidButtonPressed) {
-				avoidFlg = true;
 				if (ap >= PhotonManager.AvoidAP) {
+					avoidFlg = true;
 					ap -= PhotonManager.AvoidAP;
 					if (transform.position.x > 0) { 
 						transform.position = new Vector3(-3, transform.position.y, 0);
@@ -330,7 +325,7 @@ public class PlayerController : MonoBehaviour {
 					}
 					audios_SE[5].Play();
 				} else {
-					// AP不足
+					psAPwarning.Play();
 				}
 				ButtonScript.avoidButtonPressed = false;
         	}
@@ -352,6 +347,7 @@ public class PlayerController : MonoBehaviour {
 	void Damaged(int damage) {
 		if (gameObject.tag == "myPlayer") {
 			hp -= damage;
+			psHit.Play();
 			if (hp > 0) {
 				damageFlg = true;
 				animator.SetTrigger("Damage");

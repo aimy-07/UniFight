@@ -9,5 +9,6 @@ public class OfflineBattleStart : MonoBehaviour {
 	public void BattleStart() {
 		mainCanvas.SetActive(true);
 		OfflineManager.isPlaying = true;
+		GameObject.FindWithTag("myPlayer").GetComponent<OfflinePlayerController>().joystick = GameObject.Find("Joystick").GetComponent<Joystick>();
 	}
 }

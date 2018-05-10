@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class OfflinePlayerController : MonoBehaviour {
 
@@ -8,6 +9,7 @@ public class OfflinePlayerController : MonoBehaviour {
     public float scroll = 3f;
     float direction = 0f;
 	public bool isGround = true;
+	public Joystick joystick = null;
 
 	Rigidbody rigid;
 	Animator animator;
@@ -22,12 +24,16 @@ public class OfflinePlayerController : MonoBehaviour {
 	[SerializeField] ParticleSystem psBigRight;
 	[SerializeField] GameObject psSkill;
 	[SerializeField] GameObject psJump;
+	[SerializeField] ParticleSystem psAPwarning;
+	[SerializeField] ParticleSystem psHit;
 	AudioSource[] audios_SE = new AudioSource[7];
 
 	public int hp;
-	[SerializeField] RectTransform hpbarRect;
+	[SerializeField] Image hpbar;
+	[SerializeField] Text hpbarText;
 	public int ap;
-	[SerializeField] RectTransform apbarRect;
+	[SerializeField] Image apbar;
+	[SerializeField] Text apbarText;
 	
 
 	void Start () {
@@ -61,8 +67,10 @@ public class OfflinePlayerController : MonoBehaviour {
 			} else if (ap < 0) {
 				ap = 0;
 			}
-			hpbarRect.localScale = new Vector3((float)hp / PhotonManager.MAXHP, 1, 1);
-			apbarRect.localScale = new Vector3((float)ap / PhotonManager.MAXAP, 1, 1);
+			hpbar.fillAmount = (float)hp / PhotonManager.MAXHP;
+			hpbarText.text = "HP " + hp + " / " + PhotonManager.MAXHP;
+			apbar.fillAmount = (float)ap / PhotonManager.MAXAP;
+			apbarText.text = "AP " + ap + " / " + PhotonManager.MAXAP;
 
 			/* ---------------------------------
 				敵のいる位置に合わせて向き変更
@@ -79,27 +87,27 @@ public class OfflinePlayerController : MonoBehaviour {
 			/* ---------------------------------
 				左右の移動
 			---------------------------------- */
-			if (ButtonScript.rightButtonPressing) {
+			if (joystick.Position.x > 0.1f) {
 				if (transform.position.x < 3) {
-					direction = 1f;
+					direction = joystick.Position.x;
 				} else {
 					direction = 0;
 				}
-      		} else if (ButtonScript.leftButtonPressing) {
+      		} else if (joystick.Position.x < -0.1f) {
       	    	if (transform.position.x > -3) {
-					direction = -1f;
+					direction = joystick.Position.x;
 				} else {
 					direction = 0;
 				}
         	} else {
-        	    direction = 0f;
-        	}
+				direction = 0;
+			}
         	rigid.velocity = new Vector3(scroll * direction, rigid.velocity.y, 0);
 
 			/* ---------------------------------
 				移動アニメーション
 			---------------------------------- */
-			if (ButtonScript.leftButtonPressing || ButtonScript.rightButtonPressing) {
+			if (joystick.Position.x < -0.1f || 0.1f < joystick.Position.x) {
 				animator.SetTrigger("Walk");
 				if (!audios_SE[0].isPlaying) {
 					audios_SE[0].Play();
@@ -114,22 +122,12 @@ public class OfflinePlayerController : MonoBehaviour {
 			/* ---------------------------------
 				ジャンプ
 			---------------------------------- */
-			ButtonScript.isGround = isGround;
-			if (ButtonScript.upButtonPressing && isGround) {
+			if (joystick.Position.y > 0.1f && isGround) {
         	    rigid.AddForce(Vector3.up * flap);
 				isGround = false;
 				psJump.transform.position = new Vector3(transform.position.x, -0.2f, 0);
 				psJump.GetComponent<ParticleSystem>().Play();
 				audios_SE[1].Play();
-        	}
-
-			/* ---------------------------------
-				急降下
-			---------------------------------- */
-			if (ButtonScript.downButtonPressed && !isGround) {
-        	    rigid.AddForce(Vector3.down * flap);
-				animator.SetTrigger("JumpDown");
-				ButtonScript.downButtonPressed = false;
         	}
 
 			/* ---------------------------------
@@ -147,7 +145,7 @@ public class OfflinePlayerController : MonoBehaviour {
 					audios_SE[2].Play();
 					offlineEnemyController.myAttacked = true;
 				} else {
-					// AP不足
+					psAPwarning.Play();
 				}
 				ButtonScript.smallAttackButtonPressed = false;
        		}
@@ -167,7 +165,7 @@ public class OfflinePlayerController : MonoBehaviour {
 					audios_SE[2].Play();
 					offlineEnemyController.myAttacked = true;
 				} else {
-					// AP不足
+					psAPwarning.Play();
 				}
 				ButtonScript.bigAttackButtonPressed = false;
         	}
@@ -182,10 +180,10 @@ public class OfflinePlayerController : MonoBehaviour {
 					psSkill.transform.position = new Vector3(transform.position.x, 0, 0);
 					psSkill.GetComponent<ParticleSystem>().Play();
 					audios_SE[3].Play();
-					audios_SE[4].Play(44100 / 2);
+					audios_SE[4].PlayDelayed(0.5f);
 					offlineEnemyController.myAttacked = true;
 				} else {
-					// HP不足
+					psAPwarning.Play();
 				}
 				ButtonScript.skillButtonPressed = false;
        		}
@@ -205,7 +203,7 @@ public class OfflinePlayerController : MonoBehaviour {
 					}
 					audios_SE[5].Play();
 				} else {
-					// AP不足
+					psAPwarning.Play();
 				}
 				ButtonScript.avoidButtonPressed = false;
         	}
@@ -226,6 +224,7 @@ public class OfflinePlayerController : MonoBehaviour {
 
 	void Damaged(int damage) {
 		hp -= damage;
+		psHit.Play();
 		if (hp > 0) {
 			animator.SetTrigger("Damage");
 		} else {

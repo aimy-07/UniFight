@@ -27,9 +27,12 @@ public class RecordManager : MonoBehaviour {
 	[SerializeField] GameObject errorText;
 
 	public GameObject[] rankItems;
-	[SerializeField] Button refreshButton;
+	public Sprite[] rankItemSprites;
+ 	[SerializeField] Button refreshButton;
 	[SerializeField] GameObject nowLoading;
 	[SerializeField] GameObject failedLoading;
+
+	AudioSource[] audio_systemSE = new AudioSource[6];
 
 
 	void Start() {
@@ -51,6 +54,12 @@ public class RecordManager : MonoBehaviour {
 		percentText.text = (winPercent * 100).ToString("f1") + "%";
 
 		inputCanvas.enabled = false;
+
+		audio_systemSE = GameObject.Find("audio").GetComponents<AudioSource>();
+		// for (int i = 0; i < audio_systemSE.Length; i++) {
+		// 	audio_systemSE[i].volume = 1.0f;
+		// }
+
 
 		GetRanking();
 
@@ -93,6 +102,7 @@ public class RecordManager : MonoBehaviour {
 	}
 
 	public void EditNameButton() {
+		audio_systemSE[0].Play();
 		inputCanvas.enabled = true;
 		inputField.text = playerName;
 	}
@@ -113,11 +123,18 @@ public class RecordManager : MonoBehaviour {
 				nameText.text = playerName;
 				PlayerPrefs.SetString("PlayerName", playerName);
 				inputCanvas.enabled = false;
+				audio_systemSE[2].Play();
 		    } else {
 				errorText.SetActive(true);
+				audio_systemSE[4].Play();
 			}
         });
 		
+	}
+
+	public void CancelEditNameButton() {
+		inputCanvas.enabled = false;
+		audio_systemSE[5].Play();
 	}
 
 	bool CheckName(string name) {
@@ -140,13 +157,16 @@ public class RecordManager : MonoBehaviour {
         query.Limit = 10; // 上位10件のみ取得
         query.FindAsync ((List<NCMBObject> objList ,NCMBException e) => {
             if(e == null){ //検索成功したら
+				List<string> idList = new List<string>(); // idのリスト
                 List<string> nameList = new List<string>(); // 名前のリスト
                 List<int> winCountList = new List<int>(); // 勝った回数のリスト
 				List<int> loseCountList = new List<int>(); // 負けた回数のリスト
                 for(int i = 0; i < objList.Count; i++){
+					string _id = System.Convert.ToString(objList[i]["id"]); // idを取得
                     string n = System.Convert.ToString(objList[i]["name"]); // 名前を取得
                     int w = System.Convert.ToInt32(objList[i]["winCount"]); // 勝った回数を取得
 					int l = System.Convert.ToInt32(objList[i]["loseCount"]); // 　負けた回数を取得
+					idList.Add(_id);
                     nameList.Add(n); // リストに突っ込む
                     winCountList.Add(w);
 					loseCountList.Add(l);
@@ -154,6 +174,12 @@ public class RecordManager : MonoBehaviour {
 				int rank = 1;
 				for (int i = 0; i < rankItems.Length; i++) {
 					if (i < nameList.Count) {
+						if (idList[i] == id) {
+							rankItems[i].GetComponent<Image>().sprite = rankItemSprites[1];
+						} else {
+							rankItems[i].GetComponent<Image>().sprite = rankItemSprites[0];
+						}
+						rankItems[i].GetComponent<Image>().color = Color.white;
 						rankItems[i].transform.Find("RankText").gameObject.GetComponent<Text>().text = rank + "位";
 						rankItems[i].transform.Find("NameText").gameObject.GetComponent<Text>().text = nameList[i];
 						rankItems[i].transform.Find("CountText").gameObject.GetComponent<Text>().text = winCountList[i] + "勝 / " + loseCountList[i] + "敗";
@@ -164,6 +190,8 @@ public class RecordManager : MonoBehaviour {
 						}
 					} else {
 						// rankItems[i].SetActive(false);
+						rankItems[i].GetComponent<Image>().sprite = rankItemSprites[0];
+						rankItems[i].GetComponent<Image>().color = new Color(0.7f, 0.7f, 0.7f);
 						rankItems[i].transform.Find("RankText").gameObject.GetComponent<Text>().text = rank + "位";
 						rankItems[i].transform.Find("NameText").gameObject.GetComponent<Text>().text = "No Data";
 						rankItems[i].transform.Find("CountText").gameObject.GetComponent<Text>().text = "--勝 / --敗";
@@ -172,15 +200,22 @@ public class RecordManager : MonoBehaviour {
 	 			}
 				nowLoading.SetActive(false);
 				refreshButton.interactable = true;
+				audio_systemSE[3].Play();
             } else {  //ネットワークに接続していないなどでデータが取れなかった時
 				nowLoading.SetActive(false);
 				failedLoading.SetActive(true);
 				refreshButton.interactable = true;
+				audio_systemSE[4].Play();
 			}
         });
 	}
 
 	public void BackButton() {
+		Invoke("toTitle", 0.2f);
+		audio_systemSE[5].Play();
+	}
+
+	void toTitle() {
 		SceneManager.LoadScene("Title");
 	}
 }

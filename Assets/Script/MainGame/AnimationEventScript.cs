@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class AnimationEventScript : MonoBehaviour {
 
@@ -14,16 +15,21 @@ public class AnimationEventScript : MonoBehaviour {
 
 
 	void Start () {
-		if (PhotonManager.phase == PhotonManager.PHASE.other) {
+		if (SceneManager.GetActiveScene().name == "OfflineMain") {
 			myPlayer = GameObject.FindWithTag("myPlayer").gameObject;
 			enemyPlayer = GameObject.FindWithTag("enemyPlayer").gameObject;
 			myDamageSound = myPlayer.transform.Find("audio").gameObject.GetComponents<AudioSource>()[6];
 			enemyDamageSound = enemyPlayer.transform.Find("audio").gameObject.GetComponents<AudioSource>()[6];
+		} else if (SceneManager.GetActiveScene().name == "Title"
+				|| SceneManager.GetActiveScene().name == "Result"
+				|| SceneManager.GetActiveScene().name == "OfflineResult"
+				|| SceneManager.GetActiveScene().name == "SelectCostume") {
+			Destroy(this);
 		}
 	}
 	
 	void Update () {
-		if (PhotonManager.phase != PhotonManager.PHASE.other) {
+		if (SceneManager.GetActiveScene().name == "Main") {
 			myPlayer = GameObject.FindWithTag("myPlayer").gameObject;
 			myDamageSound = myPlayer.transform.Find("audio").gameObject.GetComponents<AudioSource>()[6];
 		}
