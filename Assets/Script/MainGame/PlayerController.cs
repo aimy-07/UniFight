@@ -22,9 +22,11 @@ public class PlayerController : MonoBehaviour {
 	ParticleSystem psBigRight;
 	GameObject psSkill;
 	GameObject psJump;
+	GameObject psHit;
 	ParticleSystem psAPwarning;
-	ParticleSystem psHit;
+	ParticleSystem psHPwarning;
 	AudioSource[] audios_SE = new AudioSource[7];
+	AudioSource APattentionSE;
 
 	PhotonView myPhotonView;
 	public bool idleFlg;
@@ -72,8 +74,10 @@ public class PlayerController : MonoBehaviour {
 		psBigRight = transform.Find("ps_BigRight").GetComponent<ParticleSystem>();
 		psJump = GameObject.Find("ps_Jump");
 		psSkill = GameObject.Find("ps_Skill");
+		psHit = GameObject.Find("ps_Hit");
 		psAPwarning = GameObject.Find("ps_APwarning").GetComponent<ParticleSystem>();
-		psHit = transform.Find("ps_Hit").GetComponent<ParticleSystem>();
+		psHPwarning = GameObject.Find("ps_HPwarning").GetComponent<ParticleSystem>();
+		APattentionSE = GameObject.Find("audio").GetComponents<AudioSource>()[0];
 		audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
 		// for (int i = 0; i < 7; i++) {
 		// 	audios_SE[i].volume = 1.0f;
@@ -122,29 +126,25 @@ public class PlayerController : MonoBehaviour {
 			charaObj.transform.Find("costume").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/costume_school" + costumeColor) as Material;
 			charaImgObj.transform.Find("costume").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/costume_school" + costumeColor) as Material;
 		}
-		switch(chara) {
+		switch(OfflineCharaSet.GetCharaNum(chara)) {
 			case 0:
+				charaObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + hairColor) as Material;
+				charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + eyeColor) as Material;
+				charaImgObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + hairColor) as Material;
+				charaImgObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + eyeColor) as Material;
+				break;
 			case 1:
+				charaObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + hairColor) as Material;
+				charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + eyeColor) as Material;
+				charaImgObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + hairColor) as Material;
+				charaImgObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + eyeColor) as Material;
+				break;
 			case 2:
-			charaObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + hairColor) as Material;
-			charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + eyeColor) as Material;
-			charaImgObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + hairColor) as Material;
-			charaImgObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + eyeColor) as Material;
-			break;
-			case 3:
-			case 4:
-			charaObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + hairColor) as Material;
-			charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + eyeColor) as Material;
-			charaImgObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + hairColor) as Material;
-			charaImgObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + eyeColor) as Material;
-			break;
-			case 5:
-			case 6:
-			charaObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + hairColor) as Material;
-			charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + eyeColor) as Material;
-			charaImgObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + hairColor) as Material;
-			charaImgObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + eyeColor) as Material;
-			break;
+				charaObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + hairColor) as Material;
+				charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + eyeColor) as Material;
+				charaImgObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + hairColor) as Material;
+				charaImgObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + eyeColor) as Material;
+				break;
 		}
 
 		Debug.Log(tag + " : キャラのセッティングが完了しました");
@@ -170,7 +170,7 @@ public class PlayerController : MonoBehaviour {
 			GameObject.Find("PhotonManager").SendMessage("BattleEnd", gameObject.tag);
 		}
 		if (PhotonManager.phase == PhotonManager.PHASE.isEnded) {
-			GetComponent<NetworkCharacter>().enabled = false;
+			// GetComponent<NetworkCharacter>().enabled = false;
 			this.enabled = false;
 		}
 
@@ -267,6 +267,7 @@ public class PlayerController : MonoBehaviour {
 					audios_SE[2].Play();
 				} else {
 					psAPwarning.Play();
+					APattentionSE.Play();
 				}
 				ButtonScript.smallAttackButtonPressed = false;
        		}
@@ -287,6 +288,7 @@ public class PlayerController : MonoBehaviour {
 					audios_SE[2].Play();
 				} else {
 					psAPwarning.Play();
+					APattentionSE.Play();
 				}
 				ButtonScript.bigAttackButtonPressed = false;
         	}
@@ -304,7 +306,8 @@ public class PlayerController : MonoBehaviour {
 					audios_SE[3].Play();
 					audios_SE[4].PlayDelayed(0.5f);
 				} else {
-					psAPwarning.Play();
+					psHPwarning.Play();
+					APattentionSE.Play();
 				}
 				ButtonScript.skillButtonPressed = false;
        		}
@@ -326,6 +329,7 @@ public class PlayerController : MonoBehaviour {
 					audios_SE[5].Play();
 				} else {
 					psAPwarning.Play();
+					APattentionSE.Play();
 				}
 				ButtonScript.avoidButtonPressed = false;
         	}
@@ -347,7 +351,8 @@ public class PlayerController : MonoBehaviour {
 	void Damaged(int damage) {
 		if (gameObject.tag == "myPlayer") {
 			hp -= damage;
-			psHit.Play();
+			psHit.transform.position = new Vector3(transform.position.x, 1.5f, -3);
+			psHit.GetComponent<ParticleSystem>().Play();
 			if (hp > 0) {
 				damageFlg = true;
 				animator.SetTrigger("Damage");

@@ -15,7 +15,7 @@ public class OfflinePlayerController : MonoBehaviour {
 	Animator animator;
 	GameObject enemyPlayer;
 	float enemyPos = 0;
-	int chara;
+	public int chara;
 	[SerializeField] OfflineEnemyController offlineEnemyController;
 
 	[SerializeField] ParticleSystem psSmallLeft;
@@ -24,9 +24,11 @@ public class OfflinePlayerController : MonoBehaviour {
 	[SerializeField] ParticleSystem psBigRight;
 	[SerializeField] GameObject psSkill;
 	[SerializeField] GameObject psJump;
+	[SerializeField] GameObject psHit;
 	[SerializeField] ParticleSystem psAPwarning;
-	[SerializeField] ParticleSystem psHit;
+	[SerializeField] ParticleSystem psHPwarning;
 	AudioSource[] audios_SE = new AudioSource[7];
+	AudioSource APattentionSE;
 
 	public int hp;
 	[SerializeField] Image hpbar;
@@ -43,9 +45,10 @@ public class OfflinePlayerController : MonoBehaviour {
 		chara = PlayerPrefs.GetInt("chara", 0);
 
 		audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
-		// for (int i = 0; i < 7; i++) {
+		// for (int i = 0; i < 7; i++) {  //CharaSE
 		// 	audios_SE[i].volume = 1.0f;
 		// }
+		APattentionSE = GameObject.Find("audio").GetComponents<AudioSource>()[0];
 
 		hp = PhotonManager.MAXHP;
 		ap = PhotonManager.MAXAP;
@@ -146,6 +149,7 @@ public class OfflinePlayerController : MonoBehaviour {
 					offlineEnemyController.myAttacked = true;
 				} else {
 					psAPwarning.Play();
+					APattentionSE.Play();
 				}
 				ButtonScript.smallAttackButtonPressed = false;
        		}
@@ -166,6 +170,7 @@ public class OfflinePlayerController : MonoBehaviour {
 					offlineEnemyController.myAttacked = true;
 				} else {
 					psAPwarning.Play();
+					APattentionSE.Play();
 				}
 				ButtonScript.bigAttackButtonPressed = false;
         	}
@@ -183,7 +188,8 @@ public class OfflinePlayerController : MonoBehaviour {
 					audios_SE[4].PlayDelayed(0.5f);
 					offlineEnemyController.myAttacked = true;
 				} else {
-					psAPwarning.Play();
+					psHPwarning.Play();
+					APattentionSE.Play();
 				}
 				ButtonScript.skillButtonPressed = false;
        		}
@@ -204,6 +210,7 @@ public class OfflinePlayerController : MonoBehaviour {
 					audios_SE[5].Play();
 				} else {
 					psAPwarning.Play();
+					APattentionSE.Play();
 				}
 				ButtonScript.avoidButtonPressed = false;
         	}
@@ -224,7 +231,8 @@ public class OfflinePlayerController : MonoBehaviour {
 
 	void Damaged(int damage) {
 		hp -= damage;
-		psHit.Play();
+		psHit.transform.position = new Vector3(transform.position.x, 1.5f, -3);
+		psHit.GetComponent<ParticleSystem>().Play();
 		if (hp > 0) {
 			animator.SetTrigger("Damage");
 		} else {

@@ -7,8 +7,11 @@ public class StartLogoManager : MonoBehaviour {
 
 	float t = 0;
 
-	void Start () {
-		// PlayerPrefs.DeleteAll();
+	void Awake()　{
+		// PC向けビルドだったらサイズ変更
+		if (Application.platform == RuntimePlatform.WindowsPlayer ||　Application.platform == RuntimePlatform.OSXPlayer)　{
+			Screen.SetResolution(1280, 720, false);
+		}
 	}
 	
 	void Update () {

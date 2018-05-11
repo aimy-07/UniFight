@@ -33,6 +33,8 @@ public class RecordManager : MonoBehaviour {
 	[SerializeField] GameObject failedLoading;
 
 	AudioSource[] audio_systemSE = new AudioSource[6];
+	[SerializeField] AudioSource bgm;
+	bool buttonPressed = false;
 
 
 	void Start() {
@@ -59,7 +61,7 @@ public class RecordManager : MonoBehaviour {
 		// for (int i = 0; i < audio_systemSE.Length; i++) {
 		// 	audio_systemSE[i].volume = 1.0f;
 		// }
-
+		//bgm.volume = 1.0f;  //BGM
 
 		GetRanking();
 
@@ -98,6 +100,9 @@ public class RecordManager : MonoBehaviour {
 			finishEditButton.interactable = true;
 		} else {
 			finishEditButton.interactable = false;
+		}
+		if (buttonPressed) {
+			bgm.volume -= Time.deltaTime * 1.2f;
 		}
 	}
 
@@ -213,6 +218,7 @@ public class RecordManager : MonoBehaviour {
 	public void BackButton() {
 		Invoke("toTitle", 0.2f);
 		audio_systemSE[5].Play();
+		buttonPressed = true;
 	}
 
 	void toTitle() {

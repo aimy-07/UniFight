@@ -6,13 +6,10 @@ using UnityEngine.SceneManagement;
 public class TitleManager : MonoBehaviour {
 
 	AudioSource[] audio_systemSE = new AudioSource[1];
+	[SerializeField] AudioSource bgm;
+	bool buttonPressed = false;
 
-	void Awake()　{
-		// PC向けビルドだったらサイズ変更
-		if (Application.platform == RuntimePlatform.WindowsPlayer ||　Application.platform == RuntimePlatform.OSXPlayer)　{
-			Screen.SetResolution(1280, 720, false);
-		}
-	}
+
 	
 	void Start() {
 		PhotonManager.phase = PhotonManager.PHASE.other;
@@ -34,29 +31,32 @@ public class TitleManager : MonoBehaviour {
 		} else {
 			charaObj.transform.Find("costume").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/costume_school" + costumeColor) as Material;
 		}
-		switch(chara) {
+		switch(OfflineCharaSet.GetCharaNum(chara)) {
 			case 0:
+				charaObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + hairColor) as Material;
+				charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + eyeColor) as Material;
+				break;
 			case 1:
+				charaObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + hairColor) as Material;
+				charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + eyeColor) as Material;
+				break;
 			case 2:
-			charaObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + hairColor) as Material;
-			charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + eyeColor) as Material;
-			break;
-			case 3:
-			case 4:
-			charaObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + hairColor) as Material;
-			charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + eyeColor) as Material;
-			break;
-			case 5:
-			case 6:
-			charaObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + hairColor) as Material;
-			charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + eyeColor) as Material;
-			break;
+				charaObj.transform.Find("hair").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + hairColor) as Material;
+				charaObj.transform.Find("eye").gameObject.GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + eyeColor) as Material;
+				break;
 		}
 
 		audio_systemSE = GameObject.Find("audio").GetComponents<AudioSource>();
 		// for (int i = 0; i < audio_systemSE.Length; i++) {
 		// 	audio_systemSE[i].volume = 1.0f;
 		// }
+		//bgm.volume = 1.0f;  //BGM
+	}
+
+	void Update() {
+		if (buttonPressed) {
+			bgm.volume -= Time.deltaTime / 1.2f;
+		}
 	}
 
 	void toSelectCostume() {
@@ -79,23 +79,27 @@ public class TitleManager : MonoBehaviour {
 		Invoke("toSelectCostume", 0.4f);
 		GameObject.Find("SelectCostumeButtonFrame").GetComponent<Animation>().Play();
 		audio_systemSE[0].Play();
+		buttonPressed = true;
 	}
 
 	public void toMatchingButton() {
 		Invoke("toMatching", 0.4f);
 		GameObject.Find("StartButtonFrame").GetComponent<Animation>().Play();
 		audio_systemSE[0].Play();
+		buttonPressed = true;
 	}
 
 	public void toOfflinePlayButton() {
 		Invoke("toOfflinePlay", 0.4f);
 		GameObject.Find("OfflineStartButtonFrame").GetComponent<Animation>().Play();
 		audio_systemSE[0].Play();
+		buttonPressed = true;
 	}
 
 	public void toRecordButton() {
 		Invoke("toRecord", 0.4f);
 		GameObject.Find("RankingButtonFrame").GetComponent<Animation>().Play();
 		audio_systemSE[0].Play();
+		buttonPressed = true;
 	}
 }

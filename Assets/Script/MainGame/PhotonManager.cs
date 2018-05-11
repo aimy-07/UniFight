@@ -11,20 +11,17 @@ public class PhotonManager : Photon.MonoBehaviour {
 		isConnecting, isReady, isStarting, isPlaying, isEnded, other
 	}
 	public static PHASE phase = PHASE.other;
-	bool roomIn;
 	
-	[SerializeField] Text statusText;
-	[SerializeField] Button reconnectPhotonButton;
-	[SerializeField] Image networkImg;
-	public Sprite[] networkImgSprites;
-	[SerializeField] Button backButton;
-	[SerializeField] GameObject loadingImg;
 	[SerializeField] GameObject matchingCanvas;
+	[SerializeField] Text statusText;
+	[SerializeField] Image networkImg;
+	[SerializeField] GameObject loadingImg;
+	[SerializeField] GameObject backButton;
+	[SerializeField] GameObject stopCanvas;
 	[SerializeField] Text statusText1;
 	[SerializeField] Text statusText2;
-	[SerializeField] GameObject stopCanvas;
 	[SerializeField] GameObject mainCanvas;
-	[SerializeField] Animator battleStartPanelAnim;
+	[SerializeField] Animation battleStartPanelAnim;
 
 	PlayerController myPlayerPlayerController;
 	PlayerController enemyPlayerPlayerController;
@@ -47,13 +44,27 @@ public class PhotonManager : Photon.MonoBehaviour {
 	public static int SmallAttackAP = 3;
 	public static int BigAttackAP = 5;
 	public static int AvoidAP = 1;
-	
+
+	AudioSource[] audio_systemSE = new AudioSource[4];
+	[SerializeField] AudioSource bgm;
+	public AudioClip startBGM;
+	public AudioClip battleBGM;
+	bool buttonPressed = false;
+
 	[SerializeField] GameObject resultCanvas;
 	[SerializeField] Text resultText;
 	GameObject winPlayer;
 	GameObject losePlayer;
 	string winPlayerTag;
 	string losePlayerTag;
+	public AudioClip[] endBGMs;
+	[SerializeField] AudioSource audio_voice;
+	public AudioClip[] startVoices;
+	public AudioClip[] attackVoice;
+	public AudioClip[] damageVoice;
+	public AudioClip[] winVoice;
+
+
 
 
 
@@ -63,13 +74,20 @@ public class PhotonManager : Photon.MonoBehaviour {
 
 		matchingCanvas.SetActive(true);
 		statusText.text = "";
-		backButton.interactable = true;
+		stopCanvas.SetActive(false);
 		statusText1.text = "";
 		statusText2.text = "";
-		stopCanvas.SetActive(false);
 		mainCanvas.SetActive(false);
 		resultCanvas.SetActive(false);
 		ResultManager.result = "";
+		ResultManager.enemyName = "";
+
+		audio_systemSE = GameObject.Find("audio").GetComponents<AudioSource>();
+		// for (int i = 0; i < audio_systemSE.Length; i++) {  //SE
+		// 	audio_systemSE[i].volume = 1.0f;
+		// }
+		//bgm.volume = 1.0f;  //BGM
+		//audio_voice.volume = 1.0f;  //VOICE
 
 		ConnectPhoton();
     }
@@ -89,17 +107,46 @@ public class PhotonManager : Photon.MonoBehaviour {
 			myApbarText.text = "AP " + myPlayerPlayerController.ap + " / " + PhotonManager.MAXAP;
 			enemyApbarText.text = "AP " + enemyPlayerPlayerController.ap + " / " + PhotonManager.MAXAP;
 		}
+		if (buttonPressed) {
+			bgm.volume -= Time.deltaTime * 1.5f;
+		}
 	}
 
 	void BattleReady() {
 		Destroy(matchingCanvas);
-		battleStartPanelAnim.SetTrigger("START");
-		Invoke("BattleStart", 3);
+		battleStartPanelAnim.Play();
+		bgm.Stop();
+		bgm.clip = startBGM;
+		bgm.Play();
 	}
 
-	void BattleStart() {
+	public void LeftVoicePlay() {
+		if (GameObject.FindWithTag("myPlayer").transform.position.x < 0) {
+			audio_voice.clip = startVoices[OfflineCharaSet.GetCharaNum(GameObject.FindWithTag("myPlayer").GetComponent<PlayerController>().chara)];
+			audio_voice.Play();
+		} else {
+			audio_voice.clip = startVoices[OfflineCharaSet.GetCharaNum(GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>().chara)];
+			audio_voice.Play();
+		}
+	}
+
+	public void RightVoicePlay() {
+		if (GameObject.FindWithTag("myPlayer").transform.position.x > 0) {
+			audio_voice.clip = startVoices[OfflineCharaSet.GetCharaNum(GameObject.FindWithTag("myPlayer").GetComponent<PlayerController>().chara)];
+			audio_voice.Play();
+		} else {
+			audio_voice.clip = startVoices[OfflineCharaSet.GetCharaNum(GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>().chara)];
+			audio_voice.Play();
+		}
+	}
+
+	public void BattleStart() {
+		bgm.Stop();
+		bgm.clip = battleBGM;
+		bgm.Play();
+		audio_voice.clip = startVoices[3];
+		audio_voice.Play();
 		mainCanvas.SetActive(true);
-		battleStartPanelAnim.SetTrigger("DELETE");
 		myPlayerPlayerController = GameObject.FindWithTag("myPlayer").GetComponent<PlayerController>();
 		myPlayerPlayerController.joystick = GameObject.Find("Joystick").GetComponent<Joystick>();
 		enemyPlayerPlayerController = GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>();
@@ -126,12 +173,14 @@ public class PhotonManager : Photon.MonoBehaviour {
 			GameObject.Find("2Pname").GetComponent<Text>().text = GameObject.FindWithTag("myPlayer").GetComponent<PlayerController>().playerName;
 			GameObject.Find("1Pname").GetComponent<Text>().text = GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>().playerName;
 		}
+		ResultManager.enemyName = GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>().playerName;
 		phase = PHASE.isPlaying;
 	}
 
 	// どちらかのHPが0になったら呼ばれる
 	void BattleEnd(string losePlayerTag) {
 		phase = PHASE.isEnded;
+		bgm.Stop();
 		if (losePlayerTag == "myPlayer") {
 			winPlayerTag = "enemyPlayer";
 		} else {
@@ -143,19 +192,23 @@ public class PhotonManager : Photon.MonoBehaviour {
 		float cam_x;
 		if (winPlayerTag == "myPlayer") {
 			cam_x = winPlayer.transform.transform.position.x;
+			audio_voice.clip = attackVoice[OfflineCharaSet.GetCharaNum(winPlayer.GetComponent<PlayerController>().chara)];
+			audio_voice.Play();
 		} else {
 			if (losePlayer.transform.rotation.y > 0) {
 				cam_x = losePlayer.transform.transform.position.x - 0.4f;
 			} else {
 				cam_x = losePlayer.transform.transform.position.x + 0.4f;
 			}
+			audio_voice.clip = damageVoice[OfflineCharaSet.GetCharaNum(losePlayer.GetComponent<PlayerController>().chara)];
+			audio_voice.Play();
 		}
 		cam.transform.position = new Vector3(cam_x, 1.5f, -10);
 		cam.transform.eulerAngles = new Vector3(6, 0, 0);
 		cam.GetComponent<Camera>().orthographicSize = 0.6f;
 		Time.timeScale = 0.5f;
 		mainCanvas.SetActive(false);
-		Invoke("ShowResult", 1);
+		Invoke("ShowResult", 0.8f);
 	}
 
 	void ShowResult() {
@@ -167,9 +220,17 @@ public class PhotonManager : Photon.MonoBehaviour {
 		if (winPlayerTag == "myPlayer") {
 			resultText.text = "You Win!";
 			ResultManager.result = "WIN";
+			audio_voice.clip = winVoice[OfflineCharaSet.GetCharaNum(winPlayer.GetComponent<PlayerController>().chara)];
+			audio_voice.Play();
+			bgm.clip = endBGMs[0];
+			bgm.loop = false;
+			bgm.Play();
 		} else {
 			resultText.text = "You Lose...";
 			ResultManager.result = "LOSE";
+			bgm.clip = endBGMs[1];
+			bgm.loop = false;
+			bgm.Play();
 		}
 	}
 
@@ -178,7 +239,8 @@ public class PhotonManager : Photon.MonoBehaviour {
 		PhotonNetwork.LeaveRoom();
 		PhotonNetwork.LeaveLobby(); 
 		PhotonNetwork.Disconnect();
-		Invoke("toResult", 0.5f);
+		Invoke("toResult", 0.3f);
+		audio_systemSE[1].Play();
 		GameObject.Find("NextButton").GetComponent<Animation>().Play();
 	}
 
@@ -186,15 +248,20 @@ public class PhotonManager : Photon.MonoBehaviour {
 		SceneManager.LoadScene("Result");
 	}
 
+	//ボタンを押したらタイトルシーンに遷移
 	public void GotoTitle() {
-		if (roomIn) {
-			phase = PHASE.other;
-			PhotonNetwork.room.IsVisible = false;
-			PhotonNetwork.room.IsOpen = false;
-			PhotonNetwork.LeaveRoom();
-			PhotonNetwork.LeaveLobby();
-			PhotonNetwork.Disconnect();
-		}
+		phase = PHASE.other;
+		PhotonNetwork.room.IsVisible = false;
+		PhotonNetwork.room.IsOpen = false;
+		PhotonNetwork.LeaveRoom();
+		PhotonNetwork.LeaveLobby();
+		PhotonNetwork.Disconnect();
+		Invoke("toTitle", 0.2f);
+		audio_systemSE[3].Play();
+		buttonPressed = true;
+	}
+
+	void toTitle() {
 		SceneManager.LoadScene("Title");
 	}
 
@@ -207,8 +274,6 @@ public class PhotonManager : Photon.MonoBehaviour {
     	PhotonNetwork.sendRate = 60;
     	PhotonNetwork.sendRateOnSerialize = 60;
 		PhotonNetwork.BackgroundTimeout = 0;
-		reconnectPhotonButton.interactable = false;
-		networkImg.sprite = networkImgSprites[0];
 		statusText.text = "ネットワークに接続中...";
 		loadingImg.SetActive(true);
 	}
@@ -251,14 +316,13 @@ public class PhotonManager : Photon.MonoBehaviour {
 	void OnPhotonCreateRoomFailed(){
 		Debug.Log ("log : ルーム作成に失敗しました");
 		Debug.Log ("log : 再度ルーム入室を試みます");
-		PhotonNetwork.JoinRandomRoom();
+		OnDisconnectedFromPhoton();
 	}
 
 	// ルーム入室した時に呼ばれるコールバックメソッド
 	// ここでキャラクターなどのプレイヤー間で共有するGameObjectを作成する
 	void OnJoinedRoom() {
     	Debug.Log ("log : ルームに入りました");
-		roomIn = true;
 		if (PhotonNetwork.room.PlayerCount == 1) {
 			PhotonNetwork.Instantiate("Player", new Vector3(-1, 0.01f, 0), Quaternion.identity, 0);
 			statusText.text = "対戦相手を待っています...";
@@ -266,7 +330,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 			PhotonNetwork.room.IsVisible = false;
 			PhotonNetwork.room.IsOpen = false;
 			statusText.text = "";
-			backButton.interactable = false;
+			backButton.SetActive(false);
 			PhotonNetwork.Instantiate("Player", new Vector3(1, 0.01f, 0), Quaternion.identity, 0);
 		}
 	}
@@ -274,7 +338,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 	void OnPhotonJoinRoomFailed() {
 		Debug.Log ("log : ルームの入室に失敗しました");
 		Debug.Log ("log : 再度ルーム入室を試みます");
-		PhotonNetwork.JoinRandomRoom();
+		OnDisconnectedFromPhoton();
 	}
 
 	// リモートプレイヤーがルームに入室した時によばれるメソッド
@@ -285,30 +349,32 @@ public class PhotonManager : Photon.MonoBehaviour {
 			PhotonNetwork.room.IsVisible = false;
 			PhotonNetwork.room.IsOpen = false;
 			statusText.text = "";
-			backButton.interactable = false;
+			backButton.SetActive(false);
 		}
-	}
-
-	public void ReConnectButton() {
-		ConnectPhoton();
-		GameObject.Find("ReConnectPhotonButton").GetComponent<Animation>().Play();
 	}
 
 	// Photonとの接続が切断された時に呼ばれるメソッド
 	void OnDisconnectedFromPhoton(){
-		Debug.Log ("log : 通信が切断されました");
+		Debug.Log ("log : ネットワークに接続していません");
 		switch(phase) {
 			case PHASE.isConnecting:
-				statusText.text = "通信エラーが発生しました\n通信の安定した場所で再度接続してください";
-				reconnectPhotonButton.interactable = true;
-				networkImg.sprite = networkImgSprites[1];
+				statusText.text = "";
+				networkImg.enabled = false;
 				loadingImg.SetActive(false);
+				backButton.SetActive(false);
+				stopCanvas.SetActive(true);
+				statusText1.text = "ネットワークに接続していません\n通信の安定した場所で再度プレイしてください";
+				audio_systemSE[2].Play();
+				bgm.Stop();
+				BackTitleCountdown3();
 				break;
 			case PHASE.isReady:
 			case PHASE.isStarting:
 			case PHASE.isPlaying:
 				stopCanvas.SetActive(true);
-				statusText1.text = "通信エラーが発生しました";
+				statusText1.text = "ネットワークに接続していません\n通信の安定した場所で再度プレイしてください";
+				audio_systemSE[2].Play();
+				bgm.Stop();
 				BackTitleCountdown3();
 				break;
 			case PHASE.isEnded:
@@ -328,7 +394,9 @@ public class PhotonManager : Photon.MonoBehaviour {
 			case PHASE.isStarting:
 			case PHASE.isPlaying:
 				stopCanvas.SetActive(true);
-				statusText1.text = "通信エラーが発生しました";
+				statusText1.text = "対戦相手との通信が切断されました";
+				audio_systemSE[2].Play();
+				bgm.Stop();
 				BackTitleCountdown3();
 			break;
 			case PHASE.isEnded:
@@ -347,14 +415,14 @@ public class PhotonManager : Photon.MonoBehaviour {
 			case PHASE.isPlaying:
 				stopCanvas.SetActive(true);
 				statusText1.text = "現在同時接続人数が上限を超えています\n時間を置いて再度プレイしてください";
+				audio_systemSE[2].Play();
+				bgm.Stop();
 				BackTitleCountdown3();
 			break;
 			case PHASE.isEnded:
 				Debug.Log ("log : すでに勝敗がついています");
 			break;
 		}	
-		statusText.text = "同時接続人数が上限を超えました\n時間を置いて再度プレイしてください";
-		Debug.Log ("log : 同時接続人数が20人を超えました");
 	}
 
 	void BackTitleCountdown3() {

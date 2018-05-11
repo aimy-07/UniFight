@@ -23,7 +23,7 @@ public class OfflineEnemyController : MonoBehaviour {
 	[SerializeField] ParticleSystem psBigRight;
 	[SerializeField] GameObject psSkill;
 	[SerializeField] GameObject psJump;
-	[SerializeField] ParticleSystem psHit;
+	[SerializeField] GameObject psHit;
 	AudioSource[] audios_SE = new AudioSource[7];
 
 	public float hp;
@@ -44,7 +44,7 @@ public class OfflineEnemyController : MonoBehaviour {
 	public bool myAttacked;
 	bool skillFlg;
 	float AP_PROB = 1.0f;
-	float JUMP_PROB = 0.3f; // ジャンプ率40%
+	float JUMP_PROB = 0.2f; // ジャンプ率20%
 	float ATTACK_PROB = 0.7f; // 攻撃積極性70%
 	float SKILL_PROB = 0.2f; // スキル発生率20%(素点)
 	float AVOID_PROB = 0.3f; // 回避率30%
@@ -57,7 +57,7 @@ public class OfflineEnemyController : MonoBehaviour {
 		myPlayer = GameObject.Find("myPlayer");
 
 		audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
-		// for (int i = 0; i < 7; i++) {
+		// for (int i = 0; i < 7; i++) {  //CharaSE
 		// 	audios_SE[i].volume = 1.0f;
 		// }
 
@@ -372,7 +372,8 @@ public class OfflineEnemyController : MonoBehaviour {
 
 	void Damaged(int damage) {
 		hp -= damage;
-		psHit.Play();
+		psHit.transform.position = new Vector3(transform.position.x, 1.5f, -3);
+		psHit.GetComponent<ParticleSystem>().Play();
 		if (hp > 0) {
 			animator.SetTrigger("Damage");
 		} else {

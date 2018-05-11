@@ -15,7 +15,7 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 	ParticleSystem psBigRight;
 	GameObject psSkill;
 	GameObject psJump;
-	ParticleSystem psHit;
+	GameObject psHit;
 	AudioSource[] audios_SE = new AudioSource[7];
 
 
@@ -27,7 +27,7 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 		psBigRight = transform.Find("ps_BigRight").GetComponent<ParticleSystem>();
 		psJump = GameObject.Find("ps_Jump");
 		psSkill = GameObject.Find("ps_Skill");
-		psHit = transform.Find("ps_Hit").GetComponent<ParticleSystem>();
+		psHit = GameObject.Find("ps_Hit");
 		audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
 		// for (int i = 0; i < 7; i++) {
 		// 	audios_SE[i].volume = 1.0f;
@@ -61,7 +61,6 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			stream.SendNext(playerController.ap);
 			
 			//アニメーション
-			if (PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
 			stream.SendNext(playerController.idleFlg);
 			stream.SendNext(playerController.walkFlg);
 			stream.SendNext(playerController.jumpFlg);
@@ -80,7 +79,6 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			playerController.avoidFlg = false;
 			playerController.damageFlg = false;
 			playerController.deathFlg = false;
-			}
 
 		} else {
 			Debug.Log("Receivred : " + gameObject.tag);
@@ -104,7 +102,6 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			playerController.ap = (int)stream.ReceiveNext();
 			
 			//アニメーション
-			if (PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
 			Animator animator = transform.Find("UTC_Default").gameObject.GetComponent<Animator>();
 			bool idleFlg = (bool)stream.ReceiveNext();
 			bool walkFlg = (bool)stream.ReceiveNext();
@@ -162,14 +159,15 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 				audios_SE[5].Play();
       		}
 			if (damageFlg) {
-				psHit.Play();
+				psHit.transform.position = new Vector3(transform.position.x, 1.5f, -3);
+				psHit.GetComponent<ParticleSystem>().Play();
 				audios_SE[6].Play();
         		animator.SetTrigger("Damage");
       		}
 			if (deathFlg) {
-				psHit.Play();
+				psHit.transform.position = new Vector3(transform.position.x, 1.5f, -3);
+				psHit.GetComponent<ParticleSystem>().Play();
         		animator.SetTrigger("Death");
-      		}
 			}
 		}
 	}

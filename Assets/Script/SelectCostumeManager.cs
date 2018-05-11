@@ -25,6 +25,8 @@ public class SelectCostumeManager : MonoBehaviour {
 	[SerializeField] Button[] buttons;
 
 	AudioSource[] audio_systemSE = new AudioSource[2];
+	[SerializeField] AudioSource bgm;
+	bool buttonPressed = false;
 
 
 
@@ -50,10 +52,13 @@ public class SelectCostumeManager : MonoBehaviour {
 		// for (int i = 0; i < audio_systemSE.Length; i++) {
 		// 	audio_systemSE[i].volume = 1.0f;
 		// }
+		//bgm.volume = 1.0f;  //BGM
 	}
 	
 	void Update () {
-
+		if (buttonPressed) {
+			bgm.volume -= Time.deltaTime * 1.5f;
+		}
 	}
 
 	void SetChara() {
@@ -73,40 +78,32 @@ public class SelectCostumeManager : MonoBehaviour {
 	}
 
 	void SetHairColor() {
-		switch(chara) {
+		switch(OfflineCharaSet.GetCharaNum(chara)) {
 			case 0:
+				charaChildObjs[chara, 3].GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + hairColor) as Material;
+				break;
 			case 1:
+				charaChildObjs[chara, 3].GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + hairColor) as Material;
+				break;
 			case 2:
-			charaChildObjs[chara, 3].GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + hairColor) as Material;
-			break;
-			case 3:
-			case 4:
-			charaChildObjs[chara, 3].GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + hairColor) as Material;
-			break;
-			case 5:
-			case 6:
-			charaChildObjs[chara, 3].GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + hairColor) as Material;
-			break;
+				charaChildObjs[chara, 3].GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + hairColor) as Material;
+				break;
 		}
 		hairColorSelectImage.sprite = hairEyeColorSprites[hairColor];
 		PlayerPrefs.SetInt("hair", hairColor);
 	}
 
 	void SetEyeColor() {
-		switch(chara) {
+		switch(OfflineCharaSet.GetCharaNum(chara)) {
 			case 0:
+				charaChildObjs[chara, 2].GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + eyeColor) as Material;
+				break;
 			case 1:
+				charaChildObjs[chara, 2].GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + eyeColor) as Material;
+				break;
 			case 2:
-			charaChildObjs[chara, 2].GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/unity" + eyeColor) as Material;
-			break;
-			case 3:
-			case 4:
-			charaChildObjs[chara, 2].GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/misaki" + eyeColor) as Material;
-			break;
-			case 5:
-			case 6:
-			charaChildObjs[chara, 2].GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + eyeColor) as Material;
-			break;
+				charaChildObjs[chara, 2].GetComponent<SkinnedMeshRenderer>().material = Resources.Load("Materials/yuko" + eyeColor) as Material;
+				break;
 		}
 		eyeColorSelectImage.sprite = hairEyeColorSprites[eyeColor];
 		PlayerPrefs.SetInt("eye", eyeColor);
@@ -258,6 +255,7 @@ public class SelectCostumeManager : MonoBehaviour {
 	public void BackButton() {
 		Invoke("toTitle", 0.2f);
 		audio_systemSE[1].Play();
+		buttonPressed = true;
 	}
 
 	void toTitle() {
