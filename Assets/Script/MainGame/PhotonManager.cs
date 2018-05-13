@@ -22,6 +22,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 	[SerializeField] Text statusText2;
 	[SerializeField] GameObject mainCanvas;
 	[SerializeField] Animation battleStartPanelAnim;
+	[SerializeField] Animation battleStartCanvasAnim;
 
 	PlayerController myPlayerPlayerController;
 	PlayerController enemyPlayerPlayerController;
@@ -35,7 +36,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 	public static int SkillDamage = 5;
 	public static int SkillOwnDamage = 7;
 
-	public static int MAXAP = 30;
+	public static int MAXAP = 20;
 	[SerializeField] Image myApbar;
 	[SerializeField] Text myApbarText;
 	[SerializeField] Image enemyApbar;
@@ -115,6 +116,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 	void BattleReady() {
 		Destroy(matchingCanvas);
 		battleStartPanelAnim.Play();
+		battleStartCanvasAnim.Play();
 		bgm.Stop();
 		bgm.clip = startBGM;
 		bgm.Play();

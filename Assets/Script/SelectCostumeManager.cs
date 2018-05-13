@@ -46,7 +46,6 @@ public class SelectCostumeManager : MonoBehaviour {
 		SetHairColor();
 		SetEyeColor();
 		SetCostumeColor();
-		SetButtons();
 
 		audio_systemSE = GameObject.Find("audio").GetComponents<AudioSource>();
 		// for (int i = 0; i < audio_systemSE.Length; i++) {
@@ -128,128 +127,89 @@ public class SelectCostumeManager : MonoBehaviour {
 	}
 
 	public void CharaNextButton() {
-		if (chara < 6) {
+		if (chara == 6) {
+			chara = 0;
+		} else {
 			chara++;
-			SetChara();
-			SetHairColor();
-			SetEyeColor();
-			SetCostumeColor();
-			SetButtons();
-			audio_systemSE[0].Play();
 		}
+		SetChara();
+		SetHairColor();
+		SetEyeColor();
+		SetCostumeColor();
+		audio_systemSE[0].Play();
 	}
 
 	public void CharaPrevButton() {
-		if (chara > 0) {
+		if (chara == 0) {
+			chara = 6;
+		} else {
 			chara--;
-			SetChara();
-			SetHairColor();
-			SetEyeColor();
-			SetCostumeColor();
-			SetButtons();
-			audio_systemSE[0].Play();
 		}
+		SetChara();
+		SetHairColor();
+		SetEyeColor();
+		SetCostumeColor();
+		audio_systemSE[0].Play();
 	}
 
 	public void HairNextButton() {
-		if (hairColor < 6) {
+		if (hairColor == 6) {
+			hairColor = 0;
+		} else {
 			hairColor++;
-			SetHairColor();
-			SetButtons();
-			audio_systemSE[0].Play();
 		}
+		SetHairColor();
+		audio_systemSE[0].Play();
 	}
 
 	public void HairPrevButton() {
-		if (hairColor > 0) {
+		if (hairColor == 0) {
+			hairColor = 6;
+		} else {
 			hairColor--;
-			SetHairColor();
-			SetButtons();
-			audio_systemSE[0].Play();
 		}
+		SetHairColor();
+		audio_systemSE[0].Play();
 	}
 
 	public void EyeNextButton() {
-		if (eyeColor < 6) {
+		if (eyeColor == 6) {
+			eyeColor = 0;
+		} else {
 			eyeColor++;
-			SetEyeColor();
-			SetButtons();
-			audio_systemSE[0].Play();
 		}
+		SetEyeColor();
+		audio_systemSE[0].Play();
 	}
 
 	public void EyePrevButton() {
-		if (eyeColor > 0) {
+		if (eyeColor == 0) {
+			eyeColor = 6;
+		} else {
 			eyeColor--;
-			SetEyeColor();
-			SetButtons();
-			audio_systemSE[0].Play();
 		}
+		SetEyeColor();
+		audio_systemSE[0].Play();
 	}
 
 	public void CostumeColorNextButton() {
-		if (costumeColor < 6) {
+		if (costumeColor == 6) {
+			costumeColor = 0;
+		} else {
 			costumeColor++;
-			SetCostumeColor();
-			SetButtons();
-			audio_systemSE[0].Play();
 		}
+		SetCostumeColor();
+		audio_systemSE[0].Play();
 	}
 
 	public void CostumeColorPrevButton() {
-		if (costumeColor > 0) {
-			costumeColor--;
-			SetCostumeColor();
-			SetButtons();
-			audio_systemSE[0].Play();
-		}
-	}
-
-	void SetButtons() {
-		//キャラ
-		if (chara == 0) {
-			buttons[0].interactable = false;
-		} else {
-			buttons[0].interactable = true;
-		}
-		if (chara == 6) {
-			buttons[1].interactable = false;
-		} else {
-			buttons[1].interactable = true;
-		}
-		//髪
-		if (hairColor == 0) {
-			buttons[2].interactable = false;
-		} else {
-			buttons[2].interactable = true;
-		}
-		if (hairColor == 6) {
-			buttons[3].interactable = false;
-		} else {
-			buttons[3].interactable = true;
-		}
-		//目
-		if (eyeColor == 0) {
-			buttons[4].interactable = false;
-		} else {
-			buttons[4].interactable = true;
-		}
-		if (eyeColor == 6) {
-			buttons[5].interactable = false;
-		} else {
-			buttons[5].interactable = true;
-		}
-		//服
 		if (costumeColor == 0) {
-			buttons[6].interactable = false;
+			costumeColor = 6;
 		} else {
-			buttons[6].interactable = true;
+			costumeColor--;
 		}
-		if (costumeColor == 6) {
-			buttons[7].interactable = false;
-		} else {
-			buttons[7].interactable = true;
-		}
+		SetCostumeColor();
+		audio_systemSE[0].Play();
 	}
 
 	public void BackButton() {

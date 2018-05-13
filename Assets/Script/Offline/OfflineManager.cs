@@ -149,12 +149,12 @@ public class OfflineManager : MonoBehaviour {
 
 	//ボタンを押したらタイトルシーンに遷移
 	public void BackTitle() {
+		Time.timeScale = 1;
 		Invoke("toTitle", 0.2f);
 		audio_systemSE[3].Play();
 	}
 
 	void toTitle() {
-		Time.timeScale = 1;
 		SceneManager.LoadScene("Title");
 	}
 }

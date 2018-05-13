@@ -17,8 +17,9 @@ public class CameraScript : MonoBehaviour {
 			}
 		}
 		if (PhotonManager.phase == PhotonManager.PHASE.isPlaying || OfflineManager.isPlaying) {
-			float x = (myPlayer.transform.position.x + enemyPlayer.transform.position.x) / 2;
-			transform.position = new Vector3(x, 1.6f, -10);
+			Vector3 nowPos = new Vector3 (transform.position.x, 1.6f, -10);
+			Vector3 targetPos = new Vector3 ((myPlayer.transform.position.x + enemyPlayer.transform.position.x)/2, 1.6f, -10);
+			transform.position = Vector3.Lerp(nowPos, targetPos, 0.5f);
 		}
 	}
 }

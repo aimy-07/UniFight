@@ -372,6 +372,7 @@ public class OfflineEnemyController : MonoBehaviour {
 
 	void Damaged(int damage) {
 		hp -= damage;
+		ap += damage;
 		psHit.transform.position = new Vector3(transform.position.x, 1.5f, -3);
 		psHit.GetComponent<ParticleSystem>().Play();
 		if (hp > 0) {

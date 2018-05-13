@@ -107,7 +107,7 @@ public class PlayerController : MonoBehaviour {
 					GameObject.Find("charaLeft" + i).SetActive(false);
 				}
 			}
-			GameObject.Find("PlayerNameLeft").GetComponent<TextMesh>().text = playerName;
+			GameObject.Find("PlayerNameLeft").GetComponent<Text>().text = playerName;
 		} else {
 			for (int i = 0; i < 7; i++) {
 				if (i == chara) {
@@ -116,7 +116,7 @@ public class PlayerController : MonoBehaviour {
 					GameObject.Find("charaRight" + i).SetActive(false);
 				}
 			}
-			GameObject.Find("PlayerNameRight").GetComponent<TextMesh>().text = playerName;
+			GameObject.Find("PlayerNameRight").GetComponent<Text>().text = playerName;
 		}
 
 		if (chara == 0) {
@@ -351,6 +351,7 @@ public class PlayerController : MonoBehaviour {
 	void Damaged(int damage) {
 		if (gameObject.tag == "myPlayer") {
 			hp -= damage;
+			ap += damage;
 			psHit.transform.position = new Vector3(transform.position.x, 1.5f, -3);
 			psHit.GetComponent<ParticleSystem>().Play();
 			if (hp > 0) {

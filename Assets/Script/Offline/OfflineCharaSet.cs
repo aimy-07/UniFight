@@ -10,7 +10,7 @@ public class OfflineCharaSet : MonoBehaviour {
 	int eyeColor;
 	int costumeColor;
 	[SerializeField] Text playerNameText;
-	[SerializeField] TextMesh playerNameTextMesh;
+	[SerializeField] Text battleStartPlayerNameText;
 
 	void Start () {
 		if (gameObject.tag == "myPlayer") {
@@ -19,7 +19,7 @@ public class OfflineCharaSet : MonoBehaviour {
 			eyeColor = PlayerPrefs.GetInt("eye", 3);
 			costumeColor = PlayerPrefs.GetInt("costume", 6);
 			playerNameText.text = PlayerPrefs.GetString("PlayerName", "No Name (Error)");
-			playerNameTextMesh.text = PlayerPrefs.GetString("PlayerName", "No Name (Error)");
+			battleStartPlayerNameText.text = PlayerPrefs.GetString("PlayerName", "No Name (Error)");
 		} else if (gameObject.tag == "enemyPlayer") {
 			chara = Random.Range(0, 7);
 			hairColor = Random.Range(0, 7);
@@ -27,7 +27,7 @@ public class OfflineCharaSet : MonoBehaviour {
 			costumeColor = Random.Range(0, 7);
 			gameObject.GetComponent<OfflineEnemyController>().chara = chara;
 			playerNameText.text = "NPC";
-			playerNameTextMesh.text = "NPC";
+			battleStartPlayerNameText.text = "NPC";
 		}
 		SetChara(chara, hairColor, eyeColor, costumeColor);
 	}
