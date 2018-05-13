@@ -63,8 +63,15 @@ public class PlayerController : MonoBehaviour {
 			eyeColor = PlayerPrefs.GetInt("eye", 3);
 			costumeColor = PlayerPrefs.GetInt("costume", 6);
 			SetChara(chara, hairColor, eyeColor, costumeColor, "myPlayer");
+			audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
+			for (int i = 1; i < 7; i++) {
+				audios_SE[i].volume = AudioSourceManager.ownCharaVolume;
+			}
 		} else {
 			gameObject.tag = "enemyPlayer";
+			for (int i = 1; i < 7; i++) {
+				audios_SE[i].volume = AudioSourceManager.enemyCharaVolume;
+			}
 		}
 
 		psSmallLeft = transform.Find("ps_SmallLeft").GetComponent<ParticleSystem>();
@@ -76,10 +83,6 @@ public class PlayerController : MonoBehaviour {
 		psHit = GameObject.Find("ps_Hit");
 		psAPwarning = GameObject.Find("ps_APwarning").GetComponent<ParticleSystem>();
 		psHPwarning = GameObject.Find("ps_HPwarning").GetComponent<ParticleSystem>();
-		audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
-		// for (int i = 0; i < 7; i++) {  //CharaSE
-		// 	audios_SE[i].volume = 1.0f;
-		// }
 
 		hp = PhotonManager.MAXHP;
 		ap = PhotonManager.MAXAP;

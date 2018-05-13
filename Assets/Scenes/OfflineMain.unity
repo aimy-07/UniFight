@@ -78004,8 +78004,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCanvas: {fileID: 1616837455}
-  startBGM: {fileID: 0}
-  battleBGM: {fileID: 0}
+  startBGM: {fileID: 8300000, guid: 3b71924a027164324bb2ff01d65ec216, type: 3}
+  battleBGM: {fileID: 8300000, guid: 6d53aa91029f84a24bdbba062b532665, type: 3}
   startVoices:
   - {fileID: 8300000, guid: 8c6b876a2756b4716bbc34ca15e73d2c, type: 3}
   - {fileID: 8300000, guid: 68df86c9b4a8a4fa7a010b250cee23b1, type: 3}

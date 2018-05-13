@@ -44,9 +44,9 @@ public class OfflinePlayerController : MonoBehaviour {
 		chara = PlayerPrefs.GetInt("chara", 0);
 
 		audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
-		// for (int i = 0; i < 7; i++) {  //CharaSE
-		// 	audios_SE[i].volume = 1.0f;
-		// }
+		for (int i = 1; i < 7; i++) {
+			audios_SE[i].volume = AudioSourceManager.ownCharaVolume;
+		}
 
 		hp = PhotonManager.MAXHP;
 		ap = PhotonManager.MAXAP;

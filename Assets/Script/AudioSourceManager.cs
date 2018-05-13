@@ -12,7 +12,7 @@ public class AudioSourceManager : MonoBehaviour {
 	public static float seVolume;
 	public static float voiceVolume;
 	public static float ownCharaVolume;
-	public static float enemyCjaraVolume;
+	public static float enemyCharaVolume;
 
 	
 	void Start () {
@@ -20,7 +20,7 @@ public class AudioSourceManager : MonoBehaviour {
 		seVolume = PlayerPrefs.GetFloat("SE", 0.8f);
 		voiceVolume = PlayerPrefs.GetFloat("VOICE", 0.8f);
 		ownCharaVolume = PlayerPrefs.GetFloat("OwnCharaSE", 0.8f);
-		enemyCjaraVolume = PlayerPrefs.GetFloat("EnemyCharaSE", 0.8f);
+		enemyCharaVolume = PlayerPrefs.GetFloat("EnemyCharaSE", 0.8f);
 		audioBGM = transform.Find("audioBGM").gameObject.GetComponent<AudioSource>();
 		audioBGM.volume = bgmVolume * 0.4f;
 		audioSE = transform.Find("audioSE").gameObject.GetComponents<AudioSource>();

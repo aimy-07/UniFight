@@ -20,7 +20,7 @@ public class AudioSetting : MonoBehaviour {
 		seSlider.value = AudioSourceManager.seVolume;
 		voiceSlider.value = AudioSourceManager.voiceVolume;
 		ownCharaSlider.value = AudioSourceManager.ownCharaVolume;
-		enemyCharaSlider.value = AudioSourceManager.enemyCjaraVolume;
+		enemyCharaSlider.value = AudioSourceManager.enemyCharaVolume;
 	}
 	
 	void Update () {
@@ -29,7 +29,7 @@ public class AudioSetting : MonoBehaviour {
 			AudioSourceManager.seVolume = seSlider.value;
 			AudioSourceManager.voiceVolume = voiceSlider.value;
 			AudioSourceManager.ownCharaVolume = ownCharaSlider.value;
-			AudioSourceManager.enemyCjaraVolume = enemyCharaSlider.value;
+			AudioSourceManager.enemyCharaVolume = enemyCharaSlider.value;
 			AudioSourceManager.ChangeVolume();
 			PlayerPrefs.SetFloat("BGM", bgmSlider.value);
 			PlayerPrefs.SetFloat("SE", bgmSlider.value);

@@ -57,9 +57,9 @@ public class OfflineEnemyController : MonoBehaviour {
 		myPlayer = GameObject.Find("myPlayer");
 
 		audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
-		// for (int i = 0; i < 7; i++) {  //CharaSE
-		// 	audios_SE[i].volume = 1.0f;
-		// }
+		for (int i = 1; i < 7; i++) {
+			audios_SE[i].volume = AudioSourceManager.enemyCharaVolume;
+		}
 
 		hp = PhotonManager.MAXHP;
 		ap = PhotonManager.MAXAP;
@@ -377,6 +377,7 @@ public class OfflineEnemyController : MonoBehaviour {
 		}
 		psHit.transform.position = new Vector3(transform.position.x, 1.5f, -3);
 		psHit.GetComponent<ParticleSystem>().Play();
+		audios_SE[6].Play();
 		if (hp > 0) {
 			animator.SetTrigger("Damage");
 		} else {
