@@ -123,13 +123,19 @@ public class OfflinePlayerController : MonoBehaviour {
 			/* ---------------------------------
 				ジャンプ
 			---------------------------------- */
-			if (joystick.Position.y > 0.1f && isGround) {
-        	    rigid.AddForce(Vector3.up * flap);
-				isGround = false;
-				psJump.transform.position = new Vector3(transform.position.x, -0.2f, 0);
-				psJump.GetComponent<ParticleSystem>().Play();
-				audios_SE[1].Play();
-        	}
+			if (joystick.Position.y > 0.1f) {
+				if (isGround) {
+        	    	rigid.AddForce(Vector3.up * flap);
+					isGround = false;
+					psJump.transform.position = new Vector3(transform.position.x, -0.2f, 0);
+					psJump.GetComponent<ParticleSystem>().Play();
+					audios_SE[1].Play();
+				}
+        	} else {
+				if (!isGround) {
+					isGround = true;
+				}
+			}
 
 			/* ---------------------------------
 				弱攻撃
@@ -215,17 +221,17 @@ public class OfflinePlayerController : MonoBehaviour {
 		}
 	}
 
-	void OnCollisionEnter(Collision c) {
-		if (c.gameObject.tag == "floor") {
-			isGround = true;
-		}
-	}
+	// void OnCollisionEnter(Collision c) {
+	// 	if (c.gameObject.tag == "floor") {
+	// 		isGround = true;
+	// 	}
+	// }
 
-	void OnCollisionExit(Collision c) {
-		if (c.gameObject.tag == "floor") {
-			isGround = false;
-		}
-	}
+	// void OnCollisionExit(Collision c) {
+	// 	if (c.gameObject.tag == "floor") {
+	// 		isGround = false;
+	// 	}
+	// }
 
 	void Damaged(int damage) {
 		hp -= damage;

@@ -7,6 +7,8 @@ public class AudioSetting : MonoBehaviour {
 
 	bool isOpen = false;
 	[SerializeField] Animator settingCanvasAnim;
+	[SerializeField] Canvas howToPlayButtonCanvas;
+	[SerializeField] Animator settingButtonCanvasAnim;
 
 	[SerializeField] Slider bgmSlider;
 	[SerializeField] Slider seSlider;
@@ -36,6 +38,10 @@ public class AudioSetting : MonoBehaviour {
 			PlayerPrefs.SetFloat("VOICE", bgmSlider.value);
 			PlayerPrefs.SetFloat("OwnCharaSE", bgmSlider.value);
 			PlayerPrefs.SetFloat("EnemyCharaSE", bgmSlider.value);
+
+			howToPlayButtonCanvas.enabled = false;
+		} else {
+			howToPlayButtonCanvas.enabled = true;
 		}
 	}
 
@@ -43,10 +49,14 @@ public class AudioSetting : MonoBehaviour {
 		AudioSourceManager.PlaySE(2);
 		if (isOpen) {
 			settingCanvasAnim.SetTrigger("Close");
-			isOpen = false;
+			settingButtonCanvasAnim.SetTrigger("Close");
 		} else {
 			settingCanvasAnim.SetTrigger("Open");
-			isOpen = true;
+			settingButtonCanvasAnim.SetTrigger("Open");
 		}
+	}
+
+	void IsOpenChange() {
+		isOpen = !isOpen;
 	}
 }
