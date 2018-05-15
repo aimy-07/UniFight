@@ -70,9 +70,9 @@ public class ResultManager : MonoBehaviour {
 
 		// キャラのセット		
 		int chara = PlayerPrefs.GetInt("chara", 0);
-		int hairColor = PlayerPrefs.GetInt("hair", 1);
-		int eyeColor = PlayerPrefs.GetInt("eye", 3);
-		int costumeColor = PlayerPrefs.GetInt("costume", 6);
+		int hairColor = PlayerPrefs.GetInt("hair", 0);
+		int eyeColor = PlayerPrefs.GetInt("eye", 0);
+		int costumeColor = PlayerPrefs.GetInt("costume", 0);
 		
 		GameObject charaObj = Instantiate(Resources.Load("CharaPrefabs/chara" + chara) as GameObject);
 		charaObj.transform.position = new Vector3(-0.4f, 0, 0);

@@ -6,29 +6,29 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/00_StartLogo.unity
+    path: Assets/Scenes/StartLogo.unity
     guid: 84015b1bf7cef45beb3b3fdf7b34d03c
   - enabled: 1
-    path: Assets/Scenes/01_InputName.unity
+    path: Assets/Scenes/InputName.unity
     guid: 44d71621c57ba47918dad36c95987959
   - enabled: 1
-    path: Assets/Scenes/02_Title.unity
+    path: Assets/Scenes/Title.unity
     guid: 69f1a9b23f72d4fb69b7c409d5d59def
   - enabled: 1
-    path: Assets/Scenes/03_Main.unity
+    path: Assets/Scenes/Main.unity
     guid: f6abf826dfc9c49b1994ed9662a14e4b
   - enabled: 1
-    path: Assets/Scenes/03_Result.unity
+    path: Assets/Scenes/Result.unity
     guid: fa81bd2998c5b47f88edddec82ac7536
   - enabled: 1
-    path: Assets/Scenes/04_OfflineMain.unity
+    path: Assets/Scenes/OfflineMain.unity
     guid: f6ca624bd587c4b058ef219f7cc371b1
   - enabled: 1
-    path: Assets/Scenes/04_OfflineResult.unity
+    path: Assets/Scenes/OfflineResult.unity
     guid: a953275dbcf224cee9e7c80006d31e02
   - enabled: 1
-    path: Assets/Scenes/05_SelectCostume.unity
+    path: Assets/Scenes/SelectCostume.unity
     guid: 94f83da52906540ce8b33a3f54262d4e
   - enabled: 1
-    path: Assets/Scenes/06_Record.unity
+    path: Assets/Scenes/Record.unity
     guid: 6e4d79f5500df4c7a85643c220757528

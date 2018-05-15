@@ -15,16 +15,16 @@ public class OfflineCharaSet : MonoBehaviour {
 	void Start () {
 		if (gameObject.tag == "myPlayer") {
 			chara = PlayerPrefs.GetInt("chara", 0);
-			hairColor = PlayerPrefs.GetInt("hair", 1);
-			eyeColor = PlayerPrefs.GetInt("eye", 3);
-			costumeColor = PlayerPrefs.GetInt("costume", 6);
+			hairColor = PlayerPrefs.GetInt("hair", 0);
+			eyeColor = PlayerPrefs.GetInt("eye", 0);
+			costumeColor = PlayerPrefs.GetInt("costume", 0);
 			playerNameText.text = PlayerPrefs.GetString("PlayerName", "No Name (Error)");
 			battleStartPlayerNameText.text = PlayerPrefs.GetString("PlayerName", "No Name (Error)");
 		} else if (gameObject.tag == "enemyPlayer") {
-			chara = Random.Range(0, 7);
-			hairColor = Random.Range(0, 7);
-			eyeColor = Random.Range(0, 7);
-			costumeColor = Random.Range(0, 7);
+			chara = Random.Range(0, SelectCostumeManager.CHARA_MAX);
+			hairColor = Random.Range(0, SelectCostumeManager.HAIRCOLOR_MAX);
+			eyeColor = Random.Range(0, SelectCostumeManager.EYECOLOR_MAX);
+			costumeColor = Random.Range(0, SelectCostumeManager.COSTUME_MAX);
 			gameObject.GetComponent<OfflineEnemyController>().chara = chara;
 			playerNameText.text = "NPC";
 			battleStartPlayerNameText.text = "NPC";
@@ -44,7 +44,7 @@ public class OfflineCharaSet : MonoBehaviour {
 
 		GameObject charaImgObj = null;
 		if (transform.position.x < 0) {
-			for (int i = 0; i < 7; i++) {
+			for (int i = 0; i < SelectCostumeManager.CHARA_MAX; i++) {
 				if (i == chara) {
 					charaImgObj = GameObject.Find("charaLeft" + i);
 				} else {
@@ -52,7 +52,7 @@ public class OfflineCharaSet : MonoBehaviour {
 				}
 			}
 		} else {
-			for (int i = 0; i < 7; i++) {
+			for (int i = 0; i < SelectCostumeManager.CHARA_MAX; i++) {
 				if (i == chara) {
 					charaImgObj = GameObject.Find("charaRight" + i);
 				} else {

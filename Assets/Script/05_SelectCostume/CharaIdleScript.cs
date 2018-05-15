@@ -25,7 +25,7 @@ public class CharaIdleScript : MonoBehaviour {
 	public void VoiceButton() {
 		int rand = Random.Range(0, 6);
 		int chara = PlayerPrefs.GetInt("chara", 0);
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; i < SelectCostumeManager.CHARA_MAX; i++) {
 			animators[i].SetTrigger(rand.ToString());
 		}
 		switch(OfflineCharaSet.GetCharaNum(chara)) {

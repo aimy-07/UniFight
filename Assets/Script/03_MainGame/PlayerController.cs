@@ -65,9 +65,9 @@ public class PlayerController : MonoBehaviour {
 			// キャラのセット
 			playerName = PlayerPrefs.GetString("PlayerName", "No Name (Error)");
 			chara = PlayerPrefs.GetInt("chara", 0);
-			hairColor = PlayerPrefs.GetInt("hair", 1);
-			eyeColor = PlayerPrefs.GetInt("eye", 3);
-			costumeColor = PlayerPrefs.GetInt("costume", 6);
+			hairColor = PlayerPrefs.GetInt("hair", 0);
+			eyeColor = PlayerPrefs.GetInt("eye", 0);
+			costumeColor = PlayerPrefs.GetInt("costume", 0);
 			SetChara("myPlayer");
 		} else {
 			gameObject.tag = "enemyPlayer";
@@ -104,7 +104,7 @@ public class PlayerController : MonoBehaviour {
 
 		GameObject charaImgObj = null;
 		if (transform.position.x < 0) {
-			for (int i = 0; i < 7; i++) {
+			for (int i = 0; i < SelectCostumeManager.CHARA_MAX; i++) {
 				if (i == chara) {
 					charaImgObj = GameObject.Find("charaLeft" + i);
 				} else {
@@ -113,7 +113,7 @@ public class PlayerController : MonoBehaviour {
 			}
 			GameObject.Find("PlayerNameLeft").GetComponent<Text>().text = playerName;
 		} else {
-			for (int i = 0; i < 7; i++) {
+			for (int i = 0; i < SelectCostumeManager.CHARA_MAX; i++) {
 				if (i == chara) {
 					charaImgObj = GameObject.Find("charaRight" + i);
 				} else {

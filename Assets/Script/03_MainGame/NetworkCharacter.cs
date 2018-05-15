@@ -29,9 +29,9 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 		psSkill = GameObject.Find("ps_Skill");
 		psHit = GameObject.Find("ps_Hit");
 		audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
-		// for (int i = 0; i < 7; i++) {
-		// 	audios_SE[i].volume = 1.0f;
-		// }
+		for (int i = 0; i < 7; i++) {
+			audios_SE[i].volume = AudioSourceManager.enemyCharaVolume;
+		}
 	}
  
 	void Update() {
