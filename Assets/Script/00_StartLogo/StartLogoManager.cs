@@ -26,12 +26,10 @@ public class StartLogoManager : MonoBehaviour {
 	void Update () {
 		t += Time.deltaTime;
 		if (t > 2) {
-			if (Input.GetMouseButton(0)) {
-				if (PlayerPrefs.GetInt("FirstOpen", 0) == 0) {
-					SceneManager.LoadScene("InputName");
-				} else if (PlayerPrefs.GetInt("FirstOpen", 0) == 1) {
-					SceneManager.LoadScene("Title");
-				}
+			if (PlayerPrefs.GetInt("FirstOpen", 0) == 0) {
+				SceneManager.LoadScene("InputName");
+			} else if (PlayerPrefs.GetInt("FirstOpen", 0) == 1) {
+				SceneManager.LoadScene("Title");
 			}
 		}
 	}

@@ -8,9 +8,10 @@ using System;
 public class PhotonManager : Photon.MonoBehaviour {
 
 	public enum PHASE{
-		isConnecting, isReady, isStarting, isPlaying, isEnded, other
+		yetJoinedRoom, isWaiting, isConnected, isReady, isPlaying, isEnded, other
 	}
 	public static PHASE phase = PHASE.other;
+	float t;
 	
 	[SerializeField] GameObject matchingCanvas;
 	[SerializeField] Text statusText;
@@ -26,7 +27,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 
 	PlayerController myPlayerPlayerController;
 	PlayerController enemyPlayerPlayerController;
-	public static int MAXHP = 50;
+	public static int MAXHP = 40;
 	[SerializeField] Image myHpbar;
 	[SerializeField] Text myHpbarText;
 	[SerializeField] Image enemyHpbar;
@@ -65,7 +66,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 
 
 	void Start() {
-		phase = PHASE.isConnecting;
+		phase = PHASE.yetJoinedRoom;
 		OfflineManager.isPlaying = false;
 
 		matchingCanvas.SetActive(true);
@@ -84,23 +85,36 @@ public class PhotonManager : Photon.MonoBehaviour {
     }
 	
 	void Update () {
-		if (phase == PHASE.isReady) {
-			BattleReady();
-			phase = PHASE.isStarting;
-		}
-		if (phase == PHASE.isPlaying) {
-			myHpbar.fillAmount = (float)myPlayerPlayerController.hp / MAXHP;
-			enemyHpbar.fillAmount = (float)enemyPlayerPlayerController.hp / MAXHP;
-			myHpbarText.text = "HP " + myPlayerPlayerController.hp + " / " + PhotonManager.MAXHP;
-			enemyHpbarText.text = "HP " + enemyPlayerPlayerController.hp + " / " + PhotonManager.MAXHP;
-			myApbar.fillAmount = (float)myPlayerPlayerController.ap / MAXAP;
-			enemyApbar.fillAmount = (float)enemyPlayerPlayerController.ap / MAXAP;
-			myApbarText.text = "AP " + myPlayerPlayerController.ap + " / " + PhotonManager.MAXAP;
-			enemyApbarText.text = "AP " + enemyPlayerPlayerController.ap + " / " + PhotonManager.MAXAP;
+		switch(phase) {
+			case PHASE.isConnected:
+				// この３秒の間に相手のみため情報を取得する
+				if (t < 3) {
+					t += Time.deltaTime;
+				} else {
+					BattleReady();
+				}
+				break;
+			case PHASE.isPlaying:
+				myHpbar.fillAmount = (float)myPlayerPlayerController.hp / MAXHP;
+				enemyHpbar.fillAmount = (float)enemyPlayerPlayerController.hp / MAXHP;
+				myHpbarText.text = "HP " + myPlayerPlayerController.hp + " / " + PhotonManager.MAXHP;
+				enemyHpbarText.text = "HP " + enemyPlayerPlayerController.hp + " / " + PhotonManager.MAXHP;
+				myApbar.fillAmount = (float)myPlayerPlayerController.ap / MAXAP;
+				enemyApbar.fillAmount = (float)enemyPlayerPlayerController.ap / MAXAP;
+				myApbarText.text = "AP " + myPlayerPlayerController.ap + " / " + PhotonManager.MAXAP;
+				enemyApbarText.text = "AP " + enemyPlayerPlayerController.ap + " / " + PhotonManager.MAXAP;
+				break;
 		}
 	}
 
 	void BattleReady() {
+		phase = PHASE.isReady;
+
+		myPlayerPlayerController = GameObject.FindWithTag("myPlayer").GetComponent<PlayerController>();
+		enemyPlayerPlayerController = GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>();
+		enemyPlayerPlayerController.SetChara("enemyPlayer");
+		ResultManager.enemyName = enemyPlayerPlayerController.playerName;
+
 		Destroy(matchingCanvas);
 		battleStartPanelAnim.Play();
 		battleStartCanvasAnim.Play();
@@ -109,32 +123,31 @@ public class PhotonManager : Photon.MonoBehaviour {
 
 	public void LeftVoicePlay() {
 		if (GameObject.FindWithTag("myPlayer").transform.position.x < 0) {
-			AudioClip clip = startVoices[OfflineCharaSet.GetCharaNum(GameObject.FindWithTag("myPlayer").GetComponent<PlayerController>().chara)];
+			AudioClip clip = startVoices[OfflineCharaSet.GetCharaNum(myPlayerPlayerController.chara)];
 			AudioSourceManager.PlayVOICE(clip);
 		} else {
-			AudioClip clip = startVoices[OfflineCharaSet.GetCharaNum(GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>().chara)];
+			AudioClip clip = startVoices[OfflineCharaSet.GetCharaNum(enemyPlayerPlayerController.chara)];
 			AudioSourceManager.PlayVOICE(clip);
 		}
 	}
 
 	public void RightVoicePlay() {
 		if (GameObject.FindWithTag("myPlayer").transform.position.x > 0) {
-			AudioClip clip = startVoices[OfflineCharaSet.GetCharaNum(GameObject.FindWithTag("myPlayer").GetComponent<PlayerController>().chara)];
+			AudioClip clip = startVoices[OfflineCharaSet.GetCharaNum(myPlayerPlayerController.chara)];
 			AudioSourceManager.PlayVOICE(clip);
 		} else {
-			AudioClip clip = startVoices[OfflineCharaSet.GetCharaNum(GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>().chara)];
+			AudioClip clip = startVoices[OfflineCharaSet.GetCharaNum(enemyPlayerPlayerController.chara)];
 			AudioSourceManager.PlayVOICE(clip);
 		}
 	}
 
 	public void BattleStart() {
+		phase = PHASE.isPlaying;
 		AudioSourceManager.PlayBGM(battleBGM);
 		AudioSourceManager.PlayVOICE(startVoices[3]);
 
 		mainCanvas.SetActive(true);
-		myPlayerPlayerController = GameObject.FindWithTag("myPlayer").GetComponent<PlayerController>();
 		myPlayerPlayerController.joystick = GameObject.Find("Joystick").GetComponent<Joystick>();
-		enemyPlayerPlayerController = GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>();
 
 		if (GameObject.FindWithTag("myPlayer").transform.position.x < 0) {
 			myHpbar = GameObject.Find("1PHPbar").GetComponent<Image>();
@@ -145,8 +158,8 @@ public class PhotonManager : Photon.MonoBehaviour {
 			enemyApbar = GameObject.Find("2PAPbar").GetComponent<Image>();
 			myApbarText = GameObject.Find("1PAPtext").GetComponent<Text>();
 			enemyApbarText = GameObject.Find("2PAPtext").GetComponent<Text>();
-			GameObject.Find("1Pname").GetComponent<Text>().text = GameObject.FindWithTag("myPlayer").GetComponent<PlayerController>().playerName;
-			GameObject.Find("2Pname").GetComponent<Text>().text = GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>().playerName;
+			GameObject.Find("1Pname").GetComponent<Text>().text = myPlayerPlayerController.playerName;
+			GameObject.Find("2Pname").GetComponent<Text>().text = enemyPlayerPlayerController.playerName;
 		} else  {
 			myHpbar = GameObject.Find("2PHPbar").GetComponent<Image>();
 			enemyHpbar = GameObject.Find("1PHPbar").GetComponent<Image>();
@@ -156,12 +169,9 @@ public class PhotonManager : Photon.MonoBehaviour {
 			enemyApbar = GameObject.Find("1PAPbar").GetComponent<Image>();
 			myApbarText = GameObject.Find("2PAPtext").GetComponent<Text>();
 			enemyApbarText = GameObject.Find("1PAPtext").GetComponent<Text>();
-			GameObject.Find("2Pname").GetComponent<Text>().text = GameObject.FindWithTag("myPlayer").GetComponent<PlayerController>().playerName;
-			GameObject.Find("1Pname").GetComponent<Text>().text = GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>().playerName;
+			GameObject.Find("2Pname").GetComponent<Text>().text = myPlayerPlayerController.playerName;
+			GameObject.Find("1Pname").GetComponent<Text>().text = enemyPlayerPlayerController.playerName;
 		}
-
-		ResultManager.enemyName = GameObject.FindWithTag("enemyPlayer").GetComponent<PlayerController>().playerName;
-		phase = PHASE.isPlaying;
 	}
 
 	// どちらかのHPが0になったら呼ばれる
@@ -174,20 +184,21 @@ public class PhotonManager : Photon.MonoBehaviour {
 			winPlayerTag = "myPlayer";
 		}
 		GameObject cam = GameObject.Find("Main Camera");
-		GameObject winPlayer = GameObject.FindWithTag(winPlayerTag);
-		GameObject losePlayer = GameObject.FindWithTag(losePlayerTag);
+		GameObject myPlayer = GameObject.FindWithTag("myPlayer");
 		float cam_x;
 		if (winPlayerTag == "myPlayer") {
-			cam_x = winPlayer.transform.transform.position.x;
-			AudioClip clip = attackVoice[OfflineCharaSet.GetCharaNum(winPlayer.GetComponent<PlayerController>().chara)];
+			// 自分が勝った
+			cam_x = myPlayer.transform.position.x;
+			AudioClip clip = attackVoice[OfflineCharaSet.GetCharaNum(myPlayerPlayerController.chara)];
 			AudioSourceManager.PlayVOICE(clip);
 		} else {
-			if (losePlayer.transform.rotation.y > 0) {
-				cam_x = losePlayer.transform.transform.position.x - 0.4f;
+			// 自分が負けた
+			if (myPlayer.transform.rotation.y > 0) {
+				cam_x = myPlayer.transform.position.x - 0.4f;
 			} else {
-				cam_x = losePlayer.transform.transform.position.x + 0.4f;
+				cam_x = myPlayer.transform.position.x + 0.4f;
 			}
-			AudioClip clip = damageVoice[OfflineCharaSet.GetCharaNum(losePlayer.GetComponent<PlayerController>().chara)];
+			AudioClip clip = damageVoice[OfflineCharaSet.GetCharaNum(myPlayerPlayerController.chara)];
 			AudioSourceManager.PlayVOICE(clip);
 		}
 		cam.transform.position = new Vector3(cam_x, 1.5f, -10);
@@ -200,18 +211,21 @@ public class PhotonManager : Photon.MonoBehaviour {
 
 	void ShowResult() {
 		Time.timeScale = 1f;
+		// 勝った方のキャラのWinモーション再生
 		GameObject winPlayer = GameObject.FindWithTag(winPlayerTag);
 		winPlayer.transform.Find("UTC_Default").gameObject.GetComponent<Animator>().SetTrigger("Win");
 		winPlayer.transform.eulerAngles = new Vector3(0, 180, 0);
 		resultCanvas.SetActive(true);
 		if (winPlayerTag == "myPlayer") {
+			// 自分が勝った
 			resultText.text = "You Win!";
 			ResultManager.result = "WIN";
-			AudioClip clip = winVoice[OfflineCharaSet.GetCharaNum(winPlayer.GetComponent<PlayerController>().chara)];
+			AudioClip clip = winVoice[OfflineCharaSet.GetCharaNum(myPlayerPlayerController.chara)];
 			AudioSourceManager.PlayVOICE(clip);
 			AudioSourceManager.audioBGM.loop = false;
 			AudioSourceManager.PlayBGM(endBGMs[0]);
 		} else {
+			// 相手が勝った
 			resultText.text = "You Lose...";
 			ResultManager.result = "LOSE";
 			AudioSourceManager.audioBGM.loop = false;
@@ -239,14 +253,20 @@ public class PhotonManager : Photon.MonoBehaviour {
 		phase = PHASE.other;
 		PhotonNetwork.room.IsVisible = false;
 		PhotonNetwork.room.IsOpen = false;
-		PhotonNetwork.LeaveRoom();
-		PhotonNetwork.LeaveLobby();
-		PhotonNetwork.Disconnect();
-		SceneManager.LoadScene("Title");
 		AudioSourceManager.PlaySE(3);
+		PhotonNetwork.LeaveRoom();
+		BackTitle();
 	}
 
-
+	public void StopGame() {
+		phase = PHASE.other;
+		PhotonNetwork.LeaveRoom();
+		stopCanvas.SetActive(true);
+		AudioSourceManager.PlaySE(4);
+		AudioSourceManager.audioBGM.Stop();
+		statusText1.text = "オンライン対戦を中断しました";
+		BackTitleCountdown3();
+	}
 
 	// Photon関係 -----------------------------------------------------
 
@@ -307,12 +327,14 @@ public class PhotonManager : Photon.MonoBehaviour {
 	void OnJoinedRoom() {
     	Debug.Log ("log : ルームに入りました");
 		if (PhotonNetwork.room.PlayerCount == 1) {
+			phase = PHASE.isWaiting;
 			PhotonNetwork.Instantiate("Player", new Vector3(-1, 0.01f, 0), Quaternion.identity, 0);
 			statusText.text = "対戦相手を待っています...";
 		} else if (PhotonNetwork.room.PlayerCount == 2) {
+			phase = PHASE.isConnected;
 			PhotonNetwork.room.IsVisible = false;
 			PhotonNetwork.room.IsOpen = false;
-			statusText.text = "";
+			statusText.text = "相手の情報を取得しています";
 			backButton.SetActive(false);
 			PhotonNetwork.Instantiate("Player", new Vector3(1, 0.01f, 0), Quaternion.identity, 0);
 		}
@@ -329,9 +351,10 @@ public class PhotonManager : Photon.MonoBehaviour {
 	void OnPhotonPlayerConnected() {
 		Debug.Log ("log : リモートプレイヤーが入室しました");
 		if (PhotonNetwork.room.PlayerCount == 2) {
+			phase = PHASE.isConnected;
 			PhotonNetwork.room.IsVisible = false;
 			PhotonNetwork.room.IsOpen = false;
-			statusText.text = "";
+			statusText.text = "相手の情報を取得しています";
 			backButton.SetActive(false);
 		}
 	}
@@ -340,7 +363,8 @@ public class PhotonManager : Photon.MonoBehaviour {
 	void OnDisconnectedFromPhoton(){
 		Debug.Log ("log : ネットワークに接続していません");
 		switch(phase) {
-			case PHASE.isConnecting:
+			case PHASE.yetJoinedRoom:
+			case PHASE.isWaiting:
 				statusText.text = "";
 				networkImg.enabled = false;
 				loadingImg.SetActive(false);
@@ -351,8 +375,8 @@ public class PhotonManager : Photon.MonoBehaviour {
 				AudioSourceManager.audioBGM.Stop();
 				BackTitleCountdown3();
 				break;
+			case PHASE.isConnected:
 			case PHASE.isReady:
-			case PHASE.isStarting:
 			case PHASE.isPlaying:
 				stopCanvas.SetActive(true);
 				statusText1.text = "ネットワークに接続していません\n通信の安定した場所で再度プレイしてください";
@@ -373,8 +397,12 @@ public class PhotonManager : Photon.MonoBehaviour {
 	void OnPhotonPlayerDisconnected(PhotonPlayer otherPlayer){
 		Debug.Log ("log : リモートプレイヤーが退室しました");
 		switch(phase) {
+			case PHASE.yetJoinedRoom:
+			case PHASE.isWaiting:
+				// まだ相手が接続していない段階なのでスルー
+				break;
+			case PHASE.isConnected:
 			case PHASE.isReady:
-			case PHASE.isStarting:
 			case PHASE.isPlaying:
 				stopCanvas.SetActive(true);
 				statusText1.text = "対戦相手との通信が切断されました";
@@ -392,9 +420,20 @@ public class PhotonManager : Photon.MonoBehaviour {
 	void OnPhotonMaxCccuReached(){
 		Debug.Log ("log : 同時接続人数が20人を超えました");
 		switch(phase) {
-			case PHASE.isConnecting:
+			case PHASE.yetJoinedRoom:
+			case PHASE.isWaiting:
+				statusText.text = "";
+				networkImg.enabled = false;
+				loadingImg.SetActive(false);
+				backButton.SetActive(false);
+				stopCanvas.SetActive(true);
+				statusText1.text = "ネットワークに接続していません\n通信の安定した場所で再度プレイしてください";
+				AudioSourceManager.PlaySE(4);
+				AudioSourceManager.audioBGM.Stop();
+				BackTitleCountdown3();
+				break;
+			case PHASE.isConnected:
 			case PHASE.isReady:
-			case PHASE.isStarting:
 			case PHASE.isPlaying:
 				stopCanvas.SetActive(true);
 				statusText1.text = "現在同時接続人数が上限を超えています\n時間を置いて再度プレイしてください";
@@ -424,6 +463,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 	}
 
 	void BackTitle() {
+		PhotonNetwork.Disconnect();
 		SceneManager.LoadScene("Title");
 	}
 }

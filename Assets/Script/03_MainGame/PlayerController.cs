@@ -8,7 +8,8 @@ public class PlayerController : MonoBehaviour {
 	public float flap = 550f;
     public float scroll = 3f;
     float direction = 0f;
-	public bool isGround = true;
+	bool isGround = true;
+	bool isJoystickUpperd = false;
 	public Joystick joystick = null;
 
 	Rigidbody rigid;
@@ -57,18 +58,20 @@ public class PlayerController : MonoBehaviour {
 
 		if (myPhotonView.isMine) {
 			gameObject.tag = "myPlayer";
+			audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
+			for (int i = 1; i < 7; i++) {
+				audios_SE[i].volume = AudioSourceManager.ownCharaVolume;
+			}
+			// キャラのセット
 			playerName = PlayerPrefs.GetString("PlayerName", "No Name (Error)");
 			chara = PlayerPrefs.GetInt("chara", 0);
 			hairColor = PlayerPrefs.GetInt("hair", 1);
 			eyeColor = PlayerPrefs.GetInt("eye", 3);
 			costumeColor = PlayerPrefs.GetInt("costume", 6);
-			SetChara(chara, hairColor, eyeColor, costumeColor, "myPlayer");
-			audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
-			for (int i = 1; i < 7; i++) {
-				audios_SE[i].volume = AudioSourceManager.ownCharaVolume;
-			}
+			SetChara("myPlayer");
 		} else {
 			gameObject.tag = "enemyPlayer";
+			audios_SE = transform.Find("audio").gameObject.GetComponents<AudioSource>();
 			for (int i = 1; i < 7; i++) {
 				audios_SE[i].volume = AudioSourceManager.enemyCharaVolume;
 			}
@@ -88,7 +91,7 @@ public class PlayerController : MonoBehaviour {
 		ap = PhotonManager.MAXAP;
 	}
 
-	void SetChara(int chara, int hairColor, int eyeColor, int costumeColor, string tag) {
+	public void SetChara(string tag) {
 		GameObject charaObj = Instantiate(Resources.Load("CharaPrefabs/chara" + chara) as GameObject);
 		charaObj.transform.parent = GameObject.FindWithTag(tag).transform;
 		charaObj.gameObject.name = "UTC_Default";
@@ -158,12 +161,6 @@ public class PlayerController : MonoBehaviour {
 					enemyPlayer = GameObject.FindWithTag("enemyPlayer").gameObject;
 					isEnemyReady = true;
 				}
-			} else if (gameObject.tag == "enemyPlayer") {
-				if (chara != -1) {
-					SetChara(chara, hairColor, eyeColor, costumeColor, "enemyPlayer");
-					PhotonManager.phase = PhotonManager.PHASE.isReady;
-					isEnemyReady = true;
-				}
 			}
 		}
 
@@ -208,13 +205,25 @@ public class PlayerController : MonoBehaviour {
 			---------------------------------- */
 			if (joystick.Position.x > 0.1f) {
 				if (transform.position.x < 3) {
-					direction = joystick.Position.x;
+					if (joystick.Position.x < -0.5f) {
+						direction = -1;
+					} else if (joystick.Position.x > 0.5f) {
+						direction = 1;
+					} else {
+						direction = joystick.Position.x * 2;
+					}
 				} else {
 					direction = 0;
 				}
       		} else if (joystick.Position.x < -0.1f) {
       	    	if (transform.position.x > -3) {
-					direction = joystick.Position.x;
+					if (joystick.Position.x < -0.5f) {
+						direction = -1;
+					} else if (joystick.Position.x > 0.5f) {
+						direction = 1;
+					} else {
+						direction = joystick.Position.x * 2;
+					}
 				} else {
 					direction = 0;
 				}
@@ -243,19 +252,17 @@ public class PlayerController : MonoBehaviour {
 			/* ---------------------------------
 				ジャンプ
 			---------------------------------- */
-			if (joystick.Position.y > 0.1f) {
-				if (isGround) {
-					jumpFlg = true;
-        	   		rigid.AddForce(Vector3.up * flap);
-					isGround = false;
-					psJump.transform.position = new Vector3(transform.position.x, -0.2f, 0);
-					psJump.GetComponent<ParticleSystem>().Play();
-					audios_SE[1].Play();
-				}
-        	} else {
-				if (!isGround) {
-					isGround = true;
-				}
+			if (joystick.Position.y > 0.6f && !isJoystickUpperd) {
+				jumpFlg = true;
+        	    rigid.AddForce(Vector3.up * flap);
+				isJoystickUpperd = true;
+				isGround = false;
+				psJump.transform.position = new Vector3(transform.position.x, -0.2f, 0);
+				psJump.GetComponent<ParticleSystem>().Play();
+				audios_SE[1].Play();
+        	}
+			if (joystick.Position.y < 0.05f && isGround) {
+				isJoystickUpperd = false;
 			}
 
 			/* ---------------------------------
@@ -343,17 +350,17 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	// void OnCollisionEnter(Collision c) {
-	// 	if (c.gameObject.tag == "floor") {
-	// 		isGround = true;
-	// 	}
-	// }
+	void OnCollisionEnter(Collision c) {
+		if (c.gameObject.tag == "floor") {
+			isGround = true;
+		}
+	}
 
-	// void OnCollisionExit(Collision c) {
-	// 	if (c.gameObject.tag == "floor") {
-	// 		isGround = false;
-	// 	}
-	// }
+	void OnCollisionExit(Collision c) {
+		if (c.gameObject.tag == "floor") {
+			isGround = false;
+		}
+	}
 
 	void Damaged(int damage) {
 		if (gameObject.tag == "myPlayer") {

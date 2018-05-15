@@ -8,7 +8,8 @@ public class OfflinePlayerController : MonoBehaviour {
 	public float flap = 550f;
     public float scroll = 3f;
     float direction = 0f;
-	public bool isGround = true;
+	bool isGround = true;
+	bool isJoystickUpperd = false;
 	public Joystick joystick = null;
 
 	Rigidbody rigid;
@@ -90,13 +91,25 @@ public class OfflinePlayerController : MonoBehaviour {
 			---------------------------------- */
 			if (joystick.Position.x > 0.1f) {
 				if (transform.position.x < 3) {
-					direction = joystick.Position.x;
+					if (joystick.Position.x < -0.5f) {
+						direction = -1;
+					} else if (joystick.Position.x > 0.5f) {
+						direction = 1;
+					} else {
+						direction = joystick.Position.x * 2;
+					}
 				} else {
 					direction = 0;
 				}
       		} else if (joystick.Position.x < -0.1f) {
       	    	if (transform.position.x > -3) {
-					direction = joystick.Position.x;
+					if (joystick.Position.x < -0.5f) {
+						direction = -1;
+					} else if (joystick.Position.x > 0.5f) {
+						direction = 1;
+					} else {
+						direction = joystick.Position.x * 2;
+					}
 				} else {
 					direction = 0;
 				}
@@ -123,18 +136,16 @@ public class OfflinePlayerController : MonoBehaviour {
 			/* ---------------------------------
 				ジャンプ
 			---------------------------------- */
-			if (joystick.Position.y > 0.1f) {
-				if (isGround) {
-        	    	rigid.AddForce(Vector3.up * flap);
-					isGround = false;
-					psJump.transform.position = new Vector3(transform.position.x, -0.2f, 0);
-					psJump.GetComponent<ParticleSystem>().Play();
-					audios_SE[1].Play();
-				}
-        	} else {
-				if (!isGround) {
-					isGround = true;
-				}
+			if (joystick.Position.y > 0.6f && !isJoystickUpperd) {
+        	    rigid.AddForce(Vector3.up * flap);
+				isJoystickUpperd = true;
+				isGround = false;
+				psJump.transform.position = new Vector3(transform.position.x, -0.2f, 0);
+				psJump.GetComponent<ParticleSystem>().Play();
+				audios_SE[1].Play();
+        	}
+			if (joystick.Position.y < 0.05f && isGround) {
+				isJoystickUpperd = false;
 			}
 
 			/* ---------------------------------
@@ -221,17 +232,17 @@ public class OfflinePlayerController : MonoBehaviour {
 		}
 	}
 
-	// void OnCollisionEnter(Collision c) {
-	// 	if (c.gameObject.tag == "floor") {
-	// 		isGround = true;
-	// 	}
-	// }
+	void OnCollisionEnter(Collision c) {
+		if (c.gameObject.tag == "floor") {
+			isGround = true;
+		}
+	}
 
-	// void OnCollisionExit(Collision c) {
-	// 	if (c.gameObject.tag == "floor") {
-	// 		isGround = false;
-	// 	}
-	// }
+	void OnCollisionExit(Collision c) {
+		if (c.gameObject.tag == "floor") {
+			isGround = false;
+		}
+	}
 
 	void Damaged(int damage) {
 		hp -= damage;
