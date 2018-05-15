@@ -108,6 +108,7 @@ public class PlayerController : MonoBehaviour {
 				if (i == chara) {
 					charaImgObj = GameObject.Find("charaLeft" + i);
 				} else {
+					Debug.Log(GameObject.Find("charaLeft" + i));
 					GameObject.Find("charaLeft" + i).SetActive(false);
 				}
 			}

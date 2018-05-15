@@ -255,12 +255,14 @@ public class PhotonManager : Photon.MonoBehaviour {
 		PhotonNetwork.room.IsOpen = false;
 		AudioSourceManager.PlaySE(3);
 		PhotonNetwork.LeaveRoom();
+		PhotonNetwork.LeaveLobby();
 		BackTitle();
 	}
 
 	public void StopGame() {
 		phase = PHASE.other;
 		PhotonNetwork.LeaveRoom();
+		PhotonNetwork.LeaveLobby();
 		stopCanvas.SetActive(true);
 		AudioSourceManager.PlaySE(4);
 		AudioSourceManager.audioBGM.Stop();
@@ -284,7 +286,8 @@ public class PhotonManager : Photon.MonoBehaviour {
 	// Photonに接続した時に呼ばれるメソッド
 	void OnConnectedToPhoton() {
 		Debug.Log ("log : Photonに接続しました");
-		Debug.Log ("log : 自動的にロビーに入ります");
+		Debug.Log ("log : ロビーに入ります");
+		PhotonNetwork.JoinLobby();
 	}
 
 	// ロビー入室時に呼ばれるメソッド
@@ -292,7 +295,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 	// 自動的にランダムにルームに入室する
 	void OnJoinedLobby () {
     	Debug.Log ("log : ロビーに入りました");
-		Debug.Log ("log : 自動的にルームに入ります");
+		Debug.Log ("log : ルームに入ります");
 		PhotonNetwork.JoinRandomRoom();
 	}
 
