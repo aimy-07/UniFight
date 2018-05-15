@@ -17,12 +17,15 @@ public class LockedCostume : MonoBehaviour {
 	[SerializeField] GameObject hairColorLockedImg;
 	[SerializeField] GameObject eyeColorLockedImg;
 	[SerializeField] GameObject costumeColorLockedImg;
+	
+	[SerializeField] AudioSource getItemSound;
 
 
 
 	void Start () {
 		set_black_locked = PlayerPrefs.GetInt("Set_black_locked", 0);
 		costumeColor_default_locked = PlayerPrefs.GetInt("CostumeColor_default_locked", 0);
+		getItemSound.volume = AudioSourceManager.seVolume;
 	}
 	
 	void Update () {
@@ -120,12 +123,14 @@ public class LockedCostume : MonoBehaviour {
 					selectCostumeManager.SetEyeColor();
 					selectCostumeManager.SetCostumeColor();
 					getItemButtons[0].SetActive(true);
+					getItemSound.Play();
 					break;
 				case 1:
 					costumeColor_default_locked = 1;
 					PlayerPrefs.SetInt("CostumeColor_default_locked", 1);
 					selectCostumeManager.SetCostumeColor();
 					getItemButtons[1].SetActive(true);
+					getItemSound.Play();
 					break;
 			}
 			break;
@@ -143,5 +148,6 @@ public class LockedCostume : MonoBehaviour {
 	public void CloseResult() {
 		getItemButtons[0].SetActive(false);
 		getItemButtons[1].SetActive(false);
+		AudioSourceManager.PlaySE(2);
 	}
 }
