@@ -154,4 +154,13 @@ public class OfflineManager : MonoBehaviour {
 	void toTitle() {
 		SceneManager.LoadScene("Title");
 	}
+
+	void OnApplicationPause (bool pauseStatus) {
+        if (pauseStatus) {
+            Debug.Log("applicationWillResignActive or onPause");
+			StopGame();
+        } else {
+            Debug.Log("applicationDidBecomeActive or onResume");
+        }
+    }
 }

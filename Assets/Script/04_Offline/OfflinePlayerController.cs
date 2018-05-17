@@ -136,7 +136,7 @@ public class OfflinePlayerController : MonoBehaviour {
 			/* ---------------------------------
 				ジャンプ
 			---------------------------------- */
-			if (joystick.Position.y > 0.6f && !isJoystickUpperd) {
+			if (joystick.Position.y > 0.5f && !isJoystickUpperd) {
         	    rigid.AddForce(Vector3.up * flap);
 				isJoystickUpperd = true;
 				isGround = false;

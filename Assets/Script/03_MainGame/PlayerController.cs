@@ -253,7 +253,7 @@ public class PlayerController : MonoBehaviour {
 			/* ---------------------------------
 				ジャンプ
 			---------------------------------- */
-			if (joystick.Position.y > 0.6f && !isJoystickUpperd) {
+			if (joystick.Position.y > 0.5f && !isJoystickUpperd) {
 				jumpFlg = true;
         	    rigid.AddForce(Vector3.up * flap);
 				isJoystickUpperd = true;

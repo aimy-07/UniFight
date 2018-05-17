@@ -37,7 +37,7 @@ public class PhotonManager : Photon.MonoBehaviour {
 	public static int SkillDamage = 4;
 	public static int SkillOwnDamage = 5;
 
-	public static int MAXAP = 25;
+	public static int MAXAP = 20;
 	[SerializeField] Image myApbar;
 	[SerializeField] Text myApbarText;
 	[SerializeField] Image enemyApbar;
@@ -268,6 +268,15 @@ public class PhotonManager : Photon.MonoBehaviour {
 		statusText1.text = "オンライン対戦を中断しました";
 		BackTitleCountdown3();
 	}
+
+	void OnApplicationPause (bool pauseStatus) {
+        if (pauseStatus) {
+            Debug.Log("applicationWillResignActive or onPause");
+			StopGame();
+        } else {
+            Debug.Log("applicationDidBecomeActive or onResume");
+        }
+    }
 
 	// Photon関係 -----------------------------------------------------
 
