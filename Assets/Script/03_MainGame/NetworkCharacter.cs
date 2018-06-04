@@ -56,7 +56,8 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			}
 			
 			else if (PhotonManager.phase == PhotonManager.PHASE.isReady
-					 || PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
+					 || PhotonManager.phase == PhotonManager.PHASE.isPlaying
+					 || PhotonManager.phase == PhotonManager.PHASE.isEnded) {
 				//位置と回転
 				stream.SendNext(transform.position);
 				stream.SendNext(transform.rotation);
@@ -99,7 +100,8 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 			}
 
 			else if (PhotonManager.phase == PhotonManager.PHASE.isReady
-					 || PhotonManager.phase == PhotonManager.PHASE.isPlaying) {
+					 || PhotonManager.phase == PhotonManager.PHASE.isPlaying
+					 || PhotonManager.phase == PhotonManager.PHASE.isEnded) {
 				//位置と回転
 				// transform.position = (Vector3)stream.ReceiveNext();
            		// transform.rotation = (Quaternion)stream.ReceiveNext();

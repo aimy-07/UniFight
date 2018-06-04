@@ -196,7 +196,7 @@ public class ResultManager : MonoBehaviour {
 		if (result == "WIN") {
 			text2 = "オンライン対戦で" + enemyName.ToString() + "に勝った！\n";
 		} else {
-			text2 = "オフライン練習対戦で" + enemyName.ToString() + "に負けた...\n";
+			text2 = "オンライン対戦で" + enemyName.ToString() + "に負けた...\n";
 		}
 		string text3 = "現在の実績　" + newWinCount + "勝" + newLoseCount + "敗！\n";
 		// string url = "https://play.google.com/store/apps/details?id=net.ARCircle.DollyRun\n";

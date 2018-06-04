@@ -305,7 +305,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4529311489335884, guid: 2e207aa2b55ab45579520319c0b19e83, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -1
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 4529311489335884, guid: 2e207aa2b55ab45579520319c0b19e83, type: 2}
       propertyPath: m_LocalPosition.y
@@ -4495,7 +4495,7 @@ AudioSource:
   m_Volume: 0
   m_Pitch: 1
   Loop: 1
-  Mute: 0
+  Mute: 1
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
@@ -19536,7 +19536,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flap: 550
   scroll: 3
-  isGround: 1
   joystick: {fileID: 0}
   chara: 0
   offlineEnemyController: {fileID: 2091974116}
@@ -38113,7 +38112,7 @@ RectTransform:
   m_GameObject: {fileID: 1401199957}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.25, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1695834754}
   m_RootOrder: 0
@@ -56064,7 +56063,7 @@ Transform:
   m_GameObject: {fileID: 1650257259}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1.6, z: 0}
-  m_LocalScale: {x: 0.45, y: 0.45, z: 0.45}
+  m_LocalScale: {x: 0.53, y: 0.45, z: 0.45}
   m_Children: []
   m_Father: {fileID: 1928389395}
   m_RootOrder: 0
@@ -56780,7 +56779,7 @@ AudioSource:
   m_Volume: 0
   m_Pitch: 1
   Loop: 1
-  Mute: 0
+  Mute: 1
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
